@@ -527,44 +527,7 @@
         const googleProvider = new GoogleAuthProvider();
         document.getElementById('btn-google').onclick = () => { signInWithPopup(auth, googleProvider).then(() => { showToast("Berhasil masuk dengan Google!", "success"); }).catch((error) => { showToast("Gagal login Google: " + error.message, "error"); }); };
 
-        async function syncData() {
-            try {
-                const localDataStr = localStorage.getItem('siguru_data_' + userUid); let localData = null;
-                if(localDataStr) { localData = JSON.parse(localDataStr); dataGlobal = localData; updateTampilan(); }
-
-                if(navigator.onLine) {
-                    const snapshot = await get(child(ref(db), `users/${userUid}`));
-                    if (snapshot.exists()) { 
-                        const cd = snapshot.val(); const cloudTime = cd.lastUpdated || 0; const localTime = localData ? (localData.lastUpdated || 0) : 0;
-                        if(localTime > cloudTime && localTime > 0) { pushToCloud(true); return; }
-
-                        const toArr = (data) => { if(!data) return []; if(Array.isArray(data)) return data.filter(Boolean); return Object.values(data).filter(Boolean); };
-                        
-                        dataGlobal.absen = cd.absen || {}; dataGlobal.infoKelas = cd.infoKelas || {}; dataGlobal.lapJabatan = cd.lapJabatan || ""; dataGlobal.lastUpdated = cloudTime; 
-                        
-                        let at = cd.autoTasks;
-                        if (typeof at === 'string') {
-                            dataGlobal.autoTasks = [];
-                            at.split('\n').forEach((line, index) => { const parts = line.split('|'); if (parts.length >= 3) dataGlobal.autoTasks.push({ id: Date.now() + index, nama: parts[0].trim(), vol: parseFloat(parts[1].trim()) || 1, sat: parts[2].trim() }); });
-                        } else if (Array.isArray(at)) { dataGlobal.autoTasks = at; } 
-                        else { dataGlobal.autoTasks = [ {id: 1, nama: "Mengisi Buku Agenda Guru : Tugas Mengajar", vol: 20, sat: "Dokumen"}, {id: 2, nama: "Merekap Nilai Harian", vol: 1, sat: "Dokumen"}, {id: 3, nama: "Membuat Laporan Catatan Kinerja Harian (LCKH)", vol: 1, sat: "Dokumen"}, {id: 4, nama: "Membuat Laporan Kinerja Bulanan ( LKB )", vol: 1, sat: "Dokumen"} ]; }
-
-                        dataGlobal.siswa = toArr(cd.siswa); dataGlobal.kegiatan = toArr(cd.kegiatan); dataGlobal.nilai = cd.nilai || {}; dataGlobal.jurnalKBM = cd.jurnalKBM || {}; dataGlobal.liburKBM = cd.liburKBM || {}; dataGlobal.bobot = cd.bobot || { sh: 40, pts: 30, asas: 30, kkm: 75 }; 
-                        dataGlobal.ttd = cd.ttd || ""; dataGlobal.ttdKepsek = cd.ttdKepsek || "";
-
-                        if(cd.jadwalTetap && (!cd.jadwalHistory || cd.jadwalHistory.length === 0)) {
-                            const migrasi = { "Senin":[], "Selasa":[], "Rabu":[], "Kamis":[], "Jumat":[], "Sabtu":[] };
-                            ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"].forEach(h => { migrasi[h] = toArr(cd.jadwalTetap[h]); });
-                            dataGlobal.jadwalHistory = [{ id: Date.now(), label: "Periode Migrasi (Otomatis)", tglMulai: "2024-01-01", tglSelesai: "2026-12-31", jadwal: migrasi }];
-                            dataGlobal.jadwalTetap = migrasi;
-                        } else { dataGlobal.jadwalHistory = cd.jadwalHistory || []; dataGlobal.jadwalTetap = cd.jadwalTetap || {}; }
-                        
-                        localStorage.setItem('siguru_data_' + userUid, JSON.stringify(dataGlobal));
-                    } else if (localData) { pushToCloud(true); }
-                    updateTampilan();
-                }
-            } catch (err) { showToast("Bekerja dalam Mode Offline Lokal.", "warning"); updateTampilan(); }
-        }
+        
         
         window.pushToCloud = function(silent = false) { 
             dataGlobal.lastUpdated = Date.now(); localStorage.setItem('siguru_data_' + userUid, JSON.stringify(dataGlobal));
@@ -625,15 +588,85 @@
             }
         }
 
+        // FUNGSI PERBAIKAN STRUKTUR DATA OTOMATIS (Mencegah Crash Akun Lama)
+        const sanitizeData = () => {
+            if (!dataGlobal.siswa || !Array.isArray(dataGlobal.siswa)) dataGlobal.siswa = [];
+            if (!dataGlobal.absen) dataGlobal.absen = {};
+            if (!dataGlobal.nilai) dataGlobal.nilai = {};
+            if (!dataGlobal.kegiatan || !Array.isArray(dataGlobal.kegiatan)) dataGlobal.kegiatan = [];
+            if (!dataGlobal.jurnalKBM) dataGlobal.jurnalKBM = {};
+            if (!dataGlobal.liburKBM) dataGlobal.liburKBM = {};
+            if (!dataGlobal.infoKelas) dataGlobal.infoKelas = {};
+            if (!dataGlobal.autoTasks || !Array.isArray(dataGlobal.autoTasks)) dataGlobal.autoTasks = [ {id: 1, nama: "Mengisi Buku Agenda Guru : Tugas Mengajar", vol: 20, sat: "Dokumen"}, {id: 2, nama: "Merekap Nilai Harian", vol: 1, sat: "Dokumen"}, {id: 3, nama: "Membuat Laporan Catatan Kinerja Harian (LCKH)", vol: 1, sat: "Dokumen"}, {id: 4, nama: "Membuat Laporan Kinerja Bulanan ( LKB )", vol: 1, sat: "Dokumen"} ];
+            if (!dataGlobal.jadwalHistory || !Array.isArray(dataGlobal.jadwalHistory)) dataGlobal.jadwalHistory = [];
+            if (!dataGlobal.jadwalTetap) dataGlobal.jadwalTetap = {};
+            if (!dataGlobal.bobot) dataGlobal.bobot = { sh: 40, pts: 30, asas: 30, kkm: 75 };
+            if (!dataGlobal.ttd) dataGlobal.ttd = "";
+            if (!dataGlobal.ttdKepsek) dataGlobal.ttdKepsek = "";
+            if (!dataGlobal.lapJabatan) dataGlobal.lapJabatan = "";
+        };
+
+        async function syncData() {
+            try {
+                const localDataStr = localStorage.getItem('siguru_data_' + userUid); let localData = null;
+                if(localDataStr) { 
+                    localData = JSON.parse(localDataStr); 
+                    dataGlobal = localData; 
+                    sanitizeData(); // Perbaiki data lokal yang usang sebelum dibaca
+                    updateTampilan(); 
+                }
+
+                if(navigator.onLine) {
+                    const snapshot = await get(child(ref(db), `users/${userUid}`));
+                    if (snapshot.exists()) { 
+                        const cd = snapshot.val(); const cloudTime = cd.lastUpdated || 0; const localTime = localData ? (localData.lastUpdated || 0) : 0;
+                        if(localTime > cloudTime && localTime > 0) { pushToCloud(true); return; }
+
+                        const toArr = (data) => { if(!data) return []; if(Array.isArray(data)) return data.filter(Boolean); return Object.values(data).filter(Boolean); };
+                        
+                        dataGlobal.absen = cd.absen || {}; dataGlobal.infoKelas = cd.infoKelas || {}; dataGlobal.lapJabatan = cd.lapJabatan || ""; dataGlobal.lastUpdated = cloudTime; 
+                        
+                        let at = cd.autoTasks;
+                        if (typeof at === 'string') {
+                            dataGlobal.autoTasks = [];
+                            at.split('\n').forEach((line, index) => { const parts = line.split('|'); if (parts.length >= 3) dataGlobal.autoTasks.push({ id: Date.now() + index, nama: parts[0].trim(), vol: parseFloat(parts[1].trim()) || 1, sat: parts[2].trim() }); });
+                        } else if (Array.isArray(at)) { dataGlobal.autoTasks = at; } 
+                        else { dataGlobal.autoTasks = [ {id: 1, nama: "Mengisi Buku Agenda Guru : Tugas Mengajar", vol: 20, sat: "Dokumen"} ]; }
+
+                        dataGlobal.siswa = toArr(cd.siswa); dataGlobal.kegiatan = toArr(cd.kegiatan); dataGlobal.nilai = cd.nilai || {}; dataGlobal.jurnalKBM = cd.jurnalKBM || {}; dataGlobal.liburKBM = cd.liburKBM || {}; dataGlobal.bobot = cd.bobot || { sh: 40, pts: 30, asas: 30, kkm: 75 }; 
+                        dataGlobal.ttd = cd.ttd || ""; dataGlobal.ttdKepsek = cd.ttdKepsek || "";
+
+                        if(cd.jadwalTetap && (!cd.jadwalHistory || cd.jadwalHistory.length === 0)) {
+                            const migrasi = { "Senin":[], "Selasa":[], "Rabu":[], "Kamis":[], "Jumat":[], "Sabtu":[] };
+                            ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"].forEach(h => { migrasi[h] = toArr(cd.jadwalTetap[h]); });
+                            dataGlobal.jadwalHistory = [{ id: Date.now(), label: "Periode Migrasi (Otomatis)", tglMulai: "2024-01-01", tglSelesai: "2026-12-31", jadwal: migrasi }];
+                            dataGlobal.jadwalTetap = migrasi;
+                        } else { dataGlobal.jadwalHistory = cd.jadwalHistory || []; dataGlobal.jadwalTetap = cd.jadwalTetap || {}; }
+                        
+                        sanitizeData(); // Perbaiki data cloud yang usang sebelum disimpan
+                        localStorage.setItem('siguru_data_' + userUid, JSON.stringify(dataGlobal));
+                    } else if (localData) { pushToCloud(true); }
+                    updateTampilan();
+                }
+            } catch (err) { 
+                console.error("Terjadi error internal saat sinkronisasi:", err); 
+                showToast("Terhubung secara Lokal.", "warning"); 
+                sanitizeData(); // Paksa perbaiki walau offline
+                try { updateTampilan(); } catch(e) { console.error("Gagal render tampilan:", e); }
+            }
+        }
+
         function updateTampilan() {
-            const classes = [...new Set(dataGlobal.siswa.map(s => s.kelas))].sort();
+            sanitizeData(); // Sabuk pengaman ganda
+            
+            const classes = [...new Set((dataGlobal.siswa).map(s => s.kelas))].sort();
             const classOptions = '<option value="">Pilih Kelas</option>' + classes.map(c => `<option value="${c}">${c}</option>`).join('');
             document.getElementById('abs-kelas').innerHTML = classOptions; document.getElementById('nil-kelas').innerHTML = classOptions; document.getElementById('nil-kelas-import').innerHTML = classOptions; document.getElementById('jt-kelas').innerHTML = classOptions;
             
             document.getElementById('dash-siswa').innerText = dataGlobal.siswa.length;
             const todayDate = new Date(); const todayStr = todayDate.toISOString().split('T')[0];
-            const jadwalHariIniFull = getJadwalByDate(todayStr); const jadwalHariIni = jadwalHariIniFull.length;
-            const kegiatanHariIni = (dataGlobal.kegiatan || []).filter(k => k.tgl === todayStr).length;
+            const jadwalHariIniFull = getJadwalByDate(todayStr) || []; const jadwalHariIni = jadwalHariIniFull.length;
+            const kegiatanHariIni = dataGlobal.kegiatan.filter(k => k.tgl === todayStr).length;
             if(document.getElementById('dash-agenda')) document.getElementById('dash-agenda').innerText = jadwalHariIni + kegiatanHariIni;
 
             let mapelSet = new Set(); 
@@ -658,7 +691,6 @@
 
             if(dataGlobal.jadwalHistory && dataGlobal.jadwalHistory.length > 0 && !activePeriodeId) { activePeriodeId = dataGlobal.jadwalHistory[dataGlobal.jadwalHistory.length - 1].id; }
             if(activePeriodeId) { pilihPeriode(activePeriodeId, true); } else { renderDaftarPeriode(); }
-            document.getElementById('lap-jabatan-guru').addEventListener('change', function() { dataGlobal.lapJabatan = this.value; pushToCloud(true); });
         }
 
         window.showPage = (id) => { document.querySelectorAll('.page').forEach(p => p.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); lucide.createIcons(); closeSidebar(); };
