@@ -760,7 +760,49 @@ footer {
     </div>
 
     <div id="modal-edit-siswa" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 hidden no-print px-4"><div class="glass-panel p-6 md:p-8 rounded-[2rem] w-full max-w-[400px] shadow-2xl border border-white"><div class="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center mb-5"><i data-lucide="user-cog" class="text-indigo-600 w-6 h-6"></i></div><h3 class="text-xl md:text-2xl font-extrabold mb-1 text-slate-900">Edit Data Siswa</h3><p class="text-xs md:text-sm text-slate-500 font-medium mb-6">Perbarui informasi identitas siswa.</p><div class="flex flex-col gap-4"><input type="hidden" id="edit-index-siswa"><div><label class="text-[10px] md:text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">Nomor Induk (NIS)</label><input type="text" id="edit-nis" class="border border-slate-200 p-3 md:p-3.5 rounded-xl w-full bg-white outline-none focus:border-indigo-500 font-semibold text-sm"></div><div><label class="text-[10px] md:text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">Nama Lengkap</label><input type="text" id="edit-nama" class="border border-slate-200 p-3 md:p-3.5 rounded-xl w-full bg-white outline-none focus:border-indigo-500 font-semibold text-sm"></div><div><label class="text-[10px] md:text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">Kelas</label><input type="text" id="edit-kelas" class="border border-slate-200 p-3 md:p-3.5 rounded-xl w-full bg-white outline-none focus:border-indigo-500 font-bold text-indigo-700 uppercase text-sm"></div></div><div class="flex justify-end gap-3 mt-8"><button onclick="tutupModalEditSiswa()" class="px-5 py-3 bg-slate-100 text-slate-600 hover:bg-slate-200 font-bold rounded-xl w-full sm:w-auto text-sm">Batal</button><button onclick="simpanEditSiswa()" class="px-5 py-3 bg-indigo-600 text-white hover:bg-indigo-700 shadow-md shadow-indigo-200 font-bold rounded-xl w-full sm:w-auto text-sm">Simpan</button></div></div></div>
-    <div id="modal-edit-jadwal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 hidden no-print px-4"><div class="glass-panel p-6 md:p-8 rounded-[2rem] w-full max-w-[450px] shadow-2xl border border-white"><h3 class="text-xl md:text-2xl font-extrabold mb-6 text-slate-900">Ubah Jadwal</h3><div class="flex flex-col gap-4"><input type="hidden" id="ej-hari"><input type="hidden" id="ej-id"><input type="hidden" id="ej-mapel-asli"><div class="grid grid-cols-2 gap-4"><div><label class="text-[10px] md:text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">Keterangan Kelas</label><input type="text" id="ej-nama" class="border border-slate-200 p-3 md:p-3.5 rounded-xl w-full bg-white outline-none focus:border-emerald-500 font-semibold text-sm"></div><div><label class="text-[10px] md:text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">Jam Ke-</label><input type="text" id="ej-jamke" class="border border-slate-200 p-3 md:p-3.5 rounded-xl w-full bg-white outline-none focus:border-emerald-500 font-bold text-emerald-700 text-sm"></div></div><div class="grid grid-cols-2 gap-4"><div><label class="text-[10px] md:text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">Mulai</label><input type="time" id="ej-mulai" class="border border-slate-200 p-3 md:p-3.5 rounded-xl w-full bg-white outline-none focus:border-emerald-500 font-semibold text-sm"></div><div><label class="text-[10px] md:text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">Selesai</label><input type="time" id="ej-selesai" class="border border-slate-200 p-3 md:p-3.5 rounded-xl w-full bg-white outline-none focus:border-emerald-500 font-semibold text-sm"></div></div><div><label class="text-[10px] md:text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">Total JP</label><input type="number" id="ej-jp" class="border border-slate-200 p-3 md:p-3.5 rounded-xl w-full bg-white outline-none focus:border-emerald-500 font-semibold text-sm text-center"></div></div><div class="flex justify-end gap-3 mt-8"><button onclick="document.getElementById('modal-edit-jadwal').classList.add('hidden')" class="px-5 py-3 bg-slate-100 text-slate-600 font-bold rounded-xl text-sm w-full sm:w-auto">Batal</button><button onclick="simpanEditJadwal()" class="px-5 py-3 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 shadow-md shadow-emerald-200 text-sm w-full sm:w-auto">Update</button></div></div></div>
+    <!-- MODAL UBAH JADWAL (HIGH CONTRAST & TERBACA JELAS) -->
+    <div id="modal-edit-jadwal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 hidden no-print px-4">
+        <div class="bg-white p-6 md:p-8 rounded-[2rem] w-full max-w-[450px] shadow-2xl border border-slate-200">
+            <h3 class="text-xl md:text-2xl font-extrabold mb-6 text-slate-900">Ubah Jadwal</h3>
+            <div class="flex flex-col gap-4">
+                <input type="hidden" id="ej-hari">
+                <input type="hidden" id="ej-id">
+                <input type="hidden" id="ej-mapel-asli">
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-[11px] font-extrabold text-slate-700 uppercase tracking-wider mb-1.5 block">Keterangan Kelas</label>
+                        <input type="text" id="ej-nama" class="border border-slate-300 p-3 md:p-3.5 rounded-xl w-full bg-slate-50 text-slate-900 font-bold text-sm outline-none focus:border-emerald-500 focus:bg-white">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-extrabold text-indigo-600 uppercase tracking-wider mb-1.5 block">Jam Ke-</label>
+                        <input type="text" id="ej-jamke" class="border border-slate-300 p-3 md:p-3.5 rounded-xl w-full bg-slate-50 text-emerald-700 font-extrabold text-sm outline-none focus:border-emerald-500 focus:bg-white">
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-[11px] font-extrabold text-slate-700 uppercase tracking-wider mb-1.5 block">Mulai Jam</label>
+                        <input type="time" id="ej-mulai" class="border border-slate-300 p-3 md:p-3.5 rounded-xl w-full bg-slate-50 text-slate-900 font-bold text-sm outline-none focus:border-emerald-500 focus:bg-white">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-extrabold text-slate-700 uppercase tracking-wider mb-1.5 block">Selesai Jam</label>
+                        <input type="time" id="ej-selesai" class="border border-slate-300 p-3 md:p-3.5 rounded-xl w-full bg-slate-50 text-slate-900 font-bold text-sm outline-none focus:border-emerald-500 focus:bg-white">
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="text-[11px] font-extrabold text-slate-700 uppercase tracking-wider mb-1.5 block">Total JP (Jam Pelajaran)</label>
+                    <input type="number" id="ej-jp" class="border border-slate-300 p-3 md:p-3.5 rounded-xl w-full bg-slate-50 text-slate-900 font-bold text-sm text-center outline-none focus:border-emerald-500 focus:bg-white">
+                </div>
+            </div>
+            
+            <div class="flex justify-end gap-3 mt-8">
+                <button onclick="document.getElementById('modal-edit-jadwal').classList.add('hidden')" class="px-5 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl text-sm w-full sm:w-auto hover:bg-slate-200">Batal</button>
+                <button onclick="simpanEditJadwal()" class="px-5 py-3 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 shadow-md shadow-emerald-200 text-sm w-full sm:w-auto">Update</button>
+            </div>
+        </div>
+    </div>
     <div id="modal-edit-kegiatan" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 hidden no-print px-4"><div class="glass-panel p-6 md:p-8 rounded-[2rem] w-full max-w-[450px] shadow-2xl border border-white"><h3 class="text-xl md:text-2xl font-extrabold mb-5 md:mb-6 text-slate-900">Ubah Kegiatan</h3><div class="flex flex-col gap-3 md:gap-4"><input type="hidden" id="ek-id"><div><label class="text-[10px] md:text-[11px] font-bold text-indigo-600 uppercase tracking-wider mb-1.5 block">Kategori Laporan</label><select id="ek-kategori" class="w-full border border-indigo-200 p-3 md:p-3.5 rounded-xl bg-indigo-50 outline-none focus:border-indigo-500 font-bold text-indigo-700 text-sm"><option value="Utama">Tugas Utama (Waka/Wali/Pembina)</option><option value="Tambahan">Tugas Tambahan</option><option value="Pelatihan">Pelatihan</option></select></div><div><label class="text-[10px] md:text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">Nama Kegiatan</label><input type="text" id="ek-nama" class="border border-slate-200 p-3 md:p-3.5 rounded-xl w-full bg-white outline-none focus:border-blue-500 font-semibold text-sm"></div><div><label class="text-[10px] md:text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">Tanggal</label><input type="date" id="ek-tgl" class="border border-slate-200 p-3 md:p-3.5 rounded-xl w-full bg-white outline-none focus:border-blue-500 font-semibold text-sm"></div><div class="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3"><div><label class="text-[10px] md:text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">Mulai</label><input type="time" id="ek-mulai" class="border border-slate-200 p-2.5 md:p-3 rounded-xl w-full bg-white outline-none focus:border-blue-500 font-medium text-sm"></div><div><label class="text-[10px] md:text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">Selesai</label><input type="time" id="ek-selesai" class="border border-slate-200 p-2.5 md:p-3 rounded-xl w-full bg-white outline-none focus:border-blue-500 font-medium text-sm"></div><div><label class="text-[10px] md:text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">JP</label><input type="number" id="ek-jp" class="border border-slate-200 p-2.5 md:p-3 rounded-xl w-full bg-white outline-none focus:border-blue-500 font-medium text-center text-sm"></div><div><label class="text-[10px] md:text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">Satuan</label><select id="ek-satuan" class="border border-slate-200 p-2.5 md:p-3 rounded-xl w-full bg-white outline-none focus:border-blue-500 font-medium text-sm"><option value="">Auto</option><option value="Kegiatan">Kegiatan</option><option value="Dokumen">Dokumen</option><option value="Laporan">Laporan</option><option value="JP">JP</option></select></div></div><div><label class="text-[10px] md:text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">Ket / Output</label><textarea id="ek-ket" class="border border-slate-200 p-3 md:p-3.5 rounded-xl w-full bg-white h-16 resize-none outline-none focus:border-blue-500 font-medium text-sm"></textarea></div></div><div class="flex justify-end gap-3 mt-6 md:mt-8"><button onclick="document.getElementById('modal-edit-kegiatan').classList.add('hidden')" class="px-5 py-3 bg-slate-100 text-slate-600 font-bold rounded-xl text-sm w-full sm:w-auto">Batal</button><button onclick="simpanEditKegiatan()" class="px-5 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 shadow-md shadow-blue-200 text-sm w-full sm:w-auto">Update Data</button></div></div></div>
     <div id="modal-edit-autotask" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 hidden no-print px-4">
         <div class="glass-panel p-6 md:p-8 rounded-[2rem] w-full max-w-[400px] shadow-2xl border border-white">
@@ -1348,12 +1390,36 @@ footer {
         };
         window.hapusAutoTask = (id) => { dataGlobal.autoTasks = dataGlobal.autoTasks.filter(t => t.id !== id); pushToCloud(true); renderAutoTasks(); showToast("Tugas dihapus dari daftar otomatis."); };
 
-        window.tambahPeriodeBaru = () => {
-            const label = document.getElementById('per-label').value; const mulai = document.getElementById('per-mulai').value; const selesai = document.getElementById('per-selesai').value;
-            if(!label || !mulai || !selesai) return showToast("Lengkapi form periode!", "warning"); if(mulai > selesai) return showToast("Tgl mulai tidak boleh lebih dari selesai!", "warning");
+       window.tambahPeriodeBaru = () => {
+            const label = document.getElementById('per-label').value; 
+            const mulai = document.getElementById('per-mulai').value; 
+            const selesai = document.getElementById('per-selesai').value;
+            if(!label || !mulai || !selesai) return showToast("Lengkapi form periode!", "warning"); 
+            if(mulai > selesai) return showToast("Tgl mulai tidak boleh lebih dari selesai!", "warning");
+            
             if(!dataGlobal.jadwalHistory) dataGlobal.jadwalHistory = [];
-            dataGlobal.jadwalHistory.push({ id: Date.now(), label, tglMulai: mulai, tglSelesai: selesai, jadwal: { "Senin":[], "Selasa":[], "Rabu":[], "Kamis":[], "Jumat":[], "Sabtu":[] } });
-            pushToCloud(true); document.getElementById('per-label').value = ''; pilihPeriode(dataGlobal.jadwalHistory[dataGlobal.jadwalHistory.length - 1].id, true); showToast("Periode berhasil dibuat!");
+            
+            // Salin (kloning) jadwal dari periode terakhir agar guru tidak perlu mengetik ulang dari nol
+            let jadwalKloning = { "Senin":[], "Selasa":[], "Rabu":[], "Kamis":[], "Jumat":[], "Sabtu":[] };
+            if (dataGlobal.jadwalHistory.length > 0) {
+                const periodeTerakhir = dataGlobal.jadwalHistory[dataGlobal.jadwalHistory.length - 1];
+                jadwalKloning = JSON.parse(JSON.stringify(periodeTerakhir.jadwal || jadwalKloning));
+            } else if (dataGlobal.jadwalTetap) {
+                jadwalKloning = JSON.parse(JSON.stringify(dataGlobal.jadwalTetap));
+            }
+            
+            dataGlobal.jadwalHistory.push({ 
+                id: Date.now(), 
+                label, 
+                tglMulai: mulai, 
+                tglSelesai: selesai, 
+                jadwal: jadwalKloning 
+            });
+            
+            pushToCloud(true); 
+            document.getElementById('per-label').value = ''; 
+            pilihPeriode(dataGlobal.jadwalHistory[dataGlobal.jadwalHistory.length - 1].id, true); 
+            showToast("Periode berhasil dibuat & jadwal otomatis disalin!");
         };
 
         window.pilihPeriode = (id, silent=false) => {
@@ -1413,20 +1479,46 @@ footer {
             pushToCloud(true); document.getElementById('keg-nama').value = ''; document.getElementById('keg-ket').value = ''; document.getElementById('keg-jp').value = ''; document.getElementById('keg-satuan').value = ''; document.getElementById('keg-tgl-akhir').value = ''; showToast(`Kegiatan disimpan untuk ${targetDates.length} hari.`);
         };
         
-// 1. FIX ZONA WAKTU 2025: Menggunakan perbandingan Teks YYYY-MM-DD
+// // FIX TOTAL: Prioritaskan Periode Aktif & Cari dari Periode TERBARU
         window.getJadwalByDate = (dateStr) => {
-            if (!dataGlobal.jadwalHistory || dataGlobal.jadwalHistory.length === 0) {
-                const targetDate = new Date(dateStr + 'T00:00:00');
-                const namaHari = namaHariIndonesia[targetDate.getDay()];
-                return (dataGlobal.jadwalTetap && dataGlobal.jadwalTetap[namaHari]) ? dataGlobal.jadwalTetap[namaHari] : [];
-            }
-            const targetDate = new Date(dateStr + 'T00:00:00'); // Memaksa zona waktu lokal
+            const targetDate = new Date(dateStr + 'T00:00:00');
             const namaHari = namaHariIndonesia[targetDate.getDay()];
-            const periode = dataGlobal.jadwalHistory.find(p => {
-                return dateStr >= p.tglMulai && dateStr <= p.tglSelesai;
-            });
-            if (!periode) { return (dataGlobal.jadwalTetap && dataGlobal.jadwalTetap[namaHari]) ? dataGlobal.jadwalTetap[namaHari] : []; }
-            return periode.jadwal[namaHari] || [];
+            
+            let periode = null;
+
+            // PRIORITAS 1: Jika ada Periode yang SEDANG AKTIF dipilih di Pengaturan Jadwal, prioritaskan itu
+            if (activePeriodeId && dataGlobal.jadwalHistory && dataGlobal.jadwalHistory.length > 0) {
+                const aktif = dataGlobal.jadwalHistory.find(p => p.id === activePeriodeId);
+                if (aktif && dateStr >= aktif.tglMulai && dateStr <= aktif.tglSelesai) {
+                    periode = aktif;
+                }
+            }
+
+            // PRIORITAS 2: Jika belum ketemu, cari dari riwayat periode TERBARU (urutan id terbesar ke terkecil)
+            if (!periode && dataGlobal.jadwalHistory && dataGlobal.jadwalHistory.length > 0) {
+                const historyTerbaru = [...dataGlobal.jadwalHistory].sort((a, b) => b.id - a.id);
+                periode = historyTerbaru.find(p => dateStr >= p.tglMulai && dateStr <= p.tglSelesai);
+            }
+
+            // PRIORITAS 3: Jika tanggal berada di luar rentang semua periode, gunakan Periode Aktif / Terbaru
+            if (!periode && dataGlobal.jadwalHistory && dataGlobal.jadwalHistory.length > 0) {
+                if (activePeriodeId) {
+                    periode = dataGlobal.jadwalHistory.find(p => p.id === activePeriodeId);
+                }
+                if (!periode) {
+                    periode = [...dataGlobal.jadwalHistory].sort((a, b) => b.id - a.id)[0];
+                }
+            }
+
+            // Ambil jadwal hari tersebut dari periode yang terpilih
+            let jadwalHari = (periode && periode.jadwal && periode.jadwal[namaHari]) ? periode.jadwal[namaHari] : [];
+            
+            // PRIORITAS 4 (Fallback): Jika jadwal di periode tersebut kosong, ambil dari jadwalTetap
+            if ((!jadwalHari || jadwalHari.length === 0) && dataGlobal.jadwalTetap && dataGlobal.jadwalTetap[namaHari]) {
+                jadwalHari = dataGlobal.jadwalTetap[namaHari];
+            }
+            
+            return jadwalHari || [];
         };
 
         // 2. FITUR EDIT PERIODE TAHUN AJARAN
@@ -1535,7 +1627,7 @@ footer {
         function tentukanVolumeDanSatuan(namaKegiatan, inputJp, manualSatuan) { if (manualSatuan && manualSatuan !== '') return { vol: inputJp || 1, sat: manualSatuan }; if (inputJp > 0) return { vol: inputJp, sat: 'JP' }; const kataDokumen = /laporan|dokumen|skp|rpp|modul|silabus|berkas|soal|kisi|rapor|jurnal/i; if (kataDokumen.test(namaKegiatan.toLowerCase())) return { vol: 1, sat: 'Dokumen' }; return { vol: 1, sat: 'Kegiatan' }; }
         function getInfoPegawai() { return { nama: document.getElementById('lap-nama-guru').value || "-", nip: document.getElementById('lap-nip-guru').value || "-", unit: document.getElementById('lap-unit-kerja').value || "MAN 2 Kota Bekasi", org: document.getElementById('lap-unit-org').value || "Kemenag Kota Bekasi", kepsek: document.getElementById('lap-nama-kepsek').value || "..................", nipKepsek: document.getElementById('lap-nip-kepsek').value || "..................", jabatan: dataGlobal.lapJabatan || "Guru Mata Pelajaran" }; }
 
-      // 1. RENDER JURNAL KBM (UI Tombol KBM Kosong yang Sangat Jelas)
+      // 1. RENDER JURNAL KBM (Dinamis membaca semua mata pelajaran & kelas)
         window.renderJurnalKBM = (fromToggle = false) => {
             const tglStr = document.getElementById('jk-tgl').value; if(!tglStr) return;
             const parts = tglStr.split('-'); const localDate = new Date(parts[0], parts[1] - 1, parts[2]); const namaHari = namaHariIndonesia[localDate.getDay()];
@@ -1544,17 +1636,20 @@ footer {
             if(!fromToggle) { cbLibur.checked = dataGlobal.liburKBM && dataGlobal.liburKBM[tglStr] ? true : false; }
             if(cbLibur.checked) { container.innerHTML = `<div class="bg-red-50 border border-red-200 rounded-xl p-6 text-center shadow-inner"><p class="text-sm text-red-600 font-extrabold mb-1">Mode Bebas KBM Aktif</p><p class="text-xs text-red-500 font-medium">Seluruh jam mengajar hari ini diliburkan.</p></div>`; return; }
 
-            const jadwalHariIni = getJadwalByDate(tglStr); 
+            const jadwalHariIni = getJadwalByDate(tglStr) || []; 
             if(jadwalHariIni.length === 0) { container.innerHTML = `<div class="bg-slate-50 border border-dashed border-slate-300 rounded-xl p-6 text-center"><p class="text-sm text-slate-400 font-medium">Tidak ada jadwal KBM pada periode tanggal ini di hari ${namaHari}.</p></div>`; return; }
             
             let html = '';
-            [...jadwalHariIni].sort((a,b) => a.mulai.localeCompare(b.mulai)).forEach(j => {
+            [...jadwalHariIni].sort((a,b) => (a.mulai||'').localeCompare(b.mulai||'')).forEach(j => {
                 const existingMateri = (dataGlobal.jurnalKBM[tglStr] && dataGlobal.jurnalKBM[tglStr][safeKey(j.id)]) ? dataGlobal.jurnalKBM[tglStr][safeKey(j.id)] : '';
                 const isSkip = existingMateri === '[LIBUR]';
                 const val = isSkip ? '' : existingMateri;
                 
+                // Menampilkan nama mapel & kelas secara dinamis (tidak terkunci teks statis)
+                const labelJadwal = j.nama ? j.nama : `${j.mapel || 'Mata Pelajaran'} ${j.kelas ? 'Kelas '+j.kelas : ''}`;
+                
                 html += `<div class="p-3 md:p-4 bg-white border border-slate-200 rounded-xl shadow-sm mb-3">
-                    <label class="text-[10px] md:text-[11px] font-extrabold text-orange-600 tracking-wider block uppercase mb-2">Jam Ke-${esc(String(j.jamKe||'-'))} • ${esc(j.nama)}</label>
+                    <label class="text-[10px] md:text-[11px] font-extrabold text-orange-600 tracking-wider block uppercase mb-2">Jam Ke-${esc(String(j.jamKe||'-'))} • ${esc(labelJadwal)}</label>
                     <div class="flex gap-2">
                         <input type="text" id="jkm-${j.id}" value="${esc(val)}" ${isSkip?'disabled':''} placeholder="${isSkip ? 'Kelas dilewati (Kosong)...' : 'Ketik materi KBM...'}" class="flex-1 ${isSkip?'bg-slate-100 text-slate-400':'bg-slate-50 text-slate-800'} border border-slate-200 rounded-lg outline-none text-xs md:text-sm font-semibold p-2.5 md:p-3 focus:border-orange-500 transition-colors">
                         <button onclick="toggleSpesifikLibur('${j.id}')" id="btn-libur-${j.id}" class="flex-none flex items-center justify-center px-3 md:px-4 rounded-lg font-bold text-[10px] md:text-xs transition-colors border ${isSkip?'bg-red-500 text-white border-red-600 shadow-inner':'bg-slate-100 text-slate-500 border-slate-200 hover:bg-red-50 hover:text-red-500 hover:border-red-200'}">
@@ -1619,23 +1714,72 @@ footer {
             pushToCloud(true); showToast(isLibur ? `Status Bebas KBM tersimpan untuk ${targetDates.length} hari!` : "Materi KBM Tersimpan!"); document.getElementById('jk-tgl-akhir').value = ''; 
         };
 
-        // 4. KUMPULKAN DATA LCKH (Melewati Jam Kosong)
+        // 4. KUMPULKAN DATA LCKH (Membaca semua mapel & otomatis menyambungkan jurnal yang terisi)
         window.kumpulkanDataLCKH = (tanggalList) => {
             let allActivities = [];
             tanggalList.forEach(tglStr => {
-                const parts = tglStr.split('-'); const localDate = new Date(parts[0], parts[1] - 1, parts[2]); const namaHari = namaHariIndonesia[localDate.getDay()];
+                const parts = tglStr.split('-'); 
+                const localDate = new Date(parts[0], parts[1] - 1, parts[2]); 
+                const namaHari = namaHariIndonesia[localDate.getDay()];
                 const isLibur = dataGlobal.liburKBM && dataGlobal.liburKBM[tglStr];
+                
                 if (!isLibur) { 
-                    const jadwalHariIni = getJadwalByDate(tglStr);
+                    // Mengambil jadwal dari periode yang tepat (sesuai getJadwalByDate terbaru)
+                    const jadwalHariIni = getJadwalByDate(tglStr) || [];
+                    const processedIds = new Set();
+
+                    // 1. Masukkan jadwal dari Periode Jadwal yang aktif/terbaru
                     jadwalHariIni.forEach(j => { 
                         const savedData = (dataGlobal.jurnalKBM[tglStr] && dataGlobal.jurnalKBM[tglStr][safeKey(j.id)]) ? dataGlobal.jurnalKBM[tglStr][safeKey(j.id)] : ''; 
                         if(savedData === '[LIBUR]') return; 
+                        
+                        processedIds.add(safeKey(j.id));
                         let materiTeks = savedData ? `\nMateri: ${savedData}` : ''; 
-                        allActivities.push({ tglStr, tglIndo: `${namaHari}, ${parts[2]} ${namaBulanIndo[parseInt(parts[1])-1]} ${parts[0]}`, uraian: `Melaksanakan KBM: ${j.nama}${materiTeks}`, output: "Terlaksana", vol: j.jp, sat: "JP", ket: "" }); 
+                        const namaMapelKelas = j.nama ? j.nama : `${j.mapel || 'Mata Pelajaran'} ${j.kelas ? 'Kelas '+j.kelas : ''}`;
+                        
+                        allActivities.push({ 
+                            tglStr, 
+                            tglIndo: `${namaHari}, ${parts[2]} ${namaBulanIndo[parseInt(parts[1])-1]} ${parts[0]}`, 
+                            uraian: `Melaksanakan KBM: ${namaMapelKelas}${materiTeks}`, 
+                            output: "Terlaksana", 
+                            vol: j.jp || 2, 
+                            sat: "JP", 
+                            ket: "" 
+                        }); 
                     }); 
+
+                    // 2. Masukkan Jurnal KBM tambahan yang mungkin diisi guru di luar jadwal tetap
+                    if (dataGlobal.jurnalKBM && dataGlobal.jurnalKBM[tglStr]) {
+                        Object.entries(dataGlobal.jurnalKBM[tglStr]).forEach(([keyId, materiVal]) => {
+                            if (!processedIds.has(keyId) && materiVal && materiVal !== '[LIBUR]') {
+                                allActivities.push({
+                                    tglStr,
+                                    tglIndo: `${namaHari}, ${parts[2]} ${namaBulanIndo[parseInt(parts[1])-1]} ${parts[0]}`,
+                                    uraian: `Melaksanakan KBM Tambahan\nMateri: ${materiVal}`,
+                                    output: "Terlaksana",
+                                    vol: 2,
+                                    sat: "JP",
+                                    ket: "Jurnal Tambahan"
+                                });
+                            }
+                        });
+                    }
                 }
-                const extraHariIni = dataGlobal.kegiatan.filter(k => k.tgl === tglStr); 
-                extraHariIni.forEach(e => { const oto = tentukanVolumeDanSatuan(e.nama, e.jp, e.satuan); allActivities.push({ tglStr, tglIndo: `${namaHari}, ${parts[2]} ${namaBulanIndo[parseInt(parts[1])-1]} ${parts[0]}`, uraian: e.nama, output: "Terlaksana", vol: oto.vol, sat: oto.sat, ket: e.ket, kategori: e.kategori }); });
+                
+                const extraHariIni = (dataGlobal.kegiatan || []).filter(k => k.tgl === tglStr); 
+                extraHariIni.forEach(e => { 
+                    const oto = tentukanVolumeDanSatuan(e.nama, e.jp, e.satuan); 
+                    allActivities.push({ 
+                        tglStr, 
+                        tglIndo: `${namaHari}, ${parts[2]} ${namaBulanIndo[parseInt(parts[1])-1]} ${parts[0]}`, 
+                        uraian: e.nama, 
+                        output: "Terlaksana", 
+                        vol: oto.vol, 
+                        sat: oto.sat, 
+                        ket: e.ket, 
+                        kategori: e.kategori 
+                    }); 
+                });
             });
             return allActivities.sort((a,b) => a.tglStr.localeCompare(b.tglStr));
         };
@@ -1788,7 +1932,7 @@ footer {
             showToast("Laporan LCKH Berhasil Dimuat!");
         };
 
-        // FORMAT HTML LKB (KBM Digabung, Tanggal Dihapus)
+        // FORMAT HTML LKB (Merekam semua variasi Mata Pelajaran secara otomatis)
         window.generateLaporanLKB = () => {
             const b = document.getElementById('lap-bulan-lkb').value; 
             if(!b) return showToast("Pilih bulan LKB!", "warning");
@@ -1799,25 +1943,27 @@ footer {
             const dataLCKH = kumpulkanDataLCKH(dates); 
             
             let tugasUtama = [], tugasTambahan = [], tugasPelatihan = [];
-            let kegiatanBulanan = dataGlobal.kegiatan.filter(k => k.tgl.startsWith(b));
+            let kegiatanBulanan = (dataGlobal.kegiatan || []).filter(k => k.tgl.startsWith(b));
             
-            // Penggabungan KBM
+            // Penggabungan KBM Dinamis (Mendeteksi semua Mapel/Kelas yang ada di LCKH)
             let mapelKBM = {};
             dataLCKH.filter(d => d.uraian.includes('Melaksanakan KBM')).forEach(d => { 
-                const match = d.uraian.match(/Melaksanakan KBM: (.*?)(?:\n|$)/); 
-                if(match) { mapelKBM[match[1]] = (mapelKBM[match[1]] || 0) + parseFloat(d.vol||0); } 
+                const match = d.uraian.match(/Melaksanakan KBM(?: Tambahan)?: (.*?)(?:\n|$)/); 
+                const namaKelasMapel = match ? match[1].trim() : "Kegiatan Belajar Mengajar";
+                mapelKBM[namaKelasMapel] = (mapelKBM[namaKelasMapel] || 0) + parseFloat(d.vol||0);
             });
             
             if(Object.keys(mapelKBM).length > 0) { 
-                Object.entries(mapelKBM).forEach(([m, jp]) => { tugasUtama.push({ uraian: `Kelas ${m} : Kegiatan Belajar Mengajar`, output: "Terlaksana", vol: jp, sat: "JP", ket: "" }); });
+                Object.entries(mapelKBM).forEach(([m, jp]) => { 
+                    tugasUtama.push({ uraian: `${m} : Kegiatan Belajar Mengajar`, output: "Terlaksana", vol: jp, sat: "JP", ket: "" }); 
+                });
             }
             if(dataGlobal.autoTasks && dataGlobal.autoTasks.length > 0) { dataGlobal.autoTasks.forEach(at => { tugasUtama.push({ uraian: at.nama, output: "Terlaksana", vol: at.vol, sat: at.sat, ket: "" }); }); }
             
-            // Pengolahan Kegiatan LKB (Tanpa Tanggal)
             let recapKegiatan = {};
             kegiatanBulanan.forEach(k => { 
                 const oto = tentukanVolumeDanSatuan(k.nama, k.jp, k.satuan);
-                let cleanNama = k.nama.trim(); // Tanggal sengaja TIDAK dimasukkan
+                let cleanNama = k.nama.trim(); 
                 let key = `${k.kategori}_${cleanNama}`;
                 if(!recapKegiatan[key]) {
                     recapKegiatan[key] = { kategori: k.kategori, uraian: cleanNama, output: "Terlaksana", vol: oto.vol, sat: oto.sat, ket: k.ket };
