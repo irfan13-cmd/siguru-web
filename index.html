@@ -649,7 +649,10 @@ footer {
                 <div class="glass-panel bg-white p-5 md:p-8 rounded-[1.5rem] mb-8 shadow-sm border border-slate-100">
                     <h3 class="text-base md:text-lg font-bold text-slate-800 mb-5 md:mb-6 flex items-center gap-2"><i data-lucide="settings" class="text-slate-500 w-4 h-4 md:w-5 md:h-5"></i> Pengaturan Identitas Cetak</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5 mb-6">
-                        <div class="col-span-1 sm:col-span-2 lg:col-span-1"><label class="text-[10px] md:text-[11px] font-extrabold text-slate-500 mb-1.5 block uppercase tracking-wider">Nama Guru</label><input type="text" id="lap-nama-guru" value="Muhammad Irfan Fadillah, S.Pd." class="w-full border border-slate-200 p-3 md:p-3.5 rounded-xl bg-white outline-none focus:border-indigo-500 font-bold text-slate-800 text-sm"></div>
+                        <div class="col-span-1 sm:col-span-2 lg:col-span-1">
+                            <label class="text-[10px] md:text-[11px] font-extrabold text-slate-500 mb-1.5 block uppercase tracking-wider">Nama Guru</label>
+                            <input type="text" id="lap-nama-guru" placeholder="Nama Lengkap & Gelar..." class="w-full border border-slate-200 p-3 md:p-3.5 rounded-xl bg-white outline-none focus:border-indigo-500 font-bold text-slate-800 text-sm">
+                        </div>
                         <div><label class="text-[10px] md:text-[11px] font-extrabold text-slate-500 mb-1.5 block uppercase tracking-wider">NIP/PegID Guru</label><input type="text" id="lap-nip-guru" placeholder="Ketik NIP" class="w-full border border-slate-200 p-3 md:p-3.5 rounded-xl bg-white outline-none focus:border-indigo-500 font-bold text-slate-800 text-sm"></div>
                         <div class="col-span-1 sm:col-span-2 lg:col-span-2"><label class="text-[10px] md:text-[11px] font-extrabold text-indigo-600 mb-1.5 block uppercase tracking-wider">Tugas Tambahan / Jabatan</label><input type="text" id="lap-jabatan-guru" placeholder="Cth: Wali Kelas / Waka Kurikulum" class="w-full border border-indigo-200 p-3 md:p-3.5 rounded-xl bg-indigo-50 outline-none focus:border-indigo-500 font-bold text-indigo-800 text-sm"></div>
                         <div><label class="text-[10px] md:text-[11px] font-extrabold text-slate-500 mb-1.5 block uppercase tracking-wider">Unit Kerja</label><input type="text" id="lap-unit-kerja" value="MAN 2 Kota Bekasi" class="w-full border border-slate-200 p-3 md:p-3.5 rounded-xl bg-white outline-none focus:border-indigo-500 font-bold text-slate-800 text-sm"></div>
@@ -1055,6 +1058,20 @@ footer {
             
             const imgTtdKepsek = document.getElementById('preview-ttd-kepsek'); const txtTtdKepsek = document.getElementById('preview-text-kepsek'); const btnDelTtdKepsek = document.getElementById('btn-hapus-ttd-kepsek');
             if(dataGlobal.ttdKepsek) { imgTtdKepsek.src = dataGlobal.ttdKepsek; imgTtdKepsek.classList.remove('hidden'); txtTtdKepsek.classList.add('hidden'); if(btnDelTtdKepsek) btnDelTtdKepsek.classList.remove('hidden'); } else { imgTtdKepsek.src = ""; imgTtdKepsek.classList.add('hidden'); txtTtdKepsek.classList.remove('hidden'); if(btnDelTtdKepsek) btnDelTtdKepsek.classList.add('hidden'); }
+           
+            // --- SAVE HANDLER NAMA GURU ---
+            // Otomatis mengisi nama dari akun login & menyimpan jika ada perubahan teks
+            const defaultNamaAkun = (auth.currentUser && auth.currentUser.displayName) ? auth.currentUser.displayName : "";
+            const elNamaGuru = document.getElementById('lap-nama-guru');
+            if (elNamaGuru) {
+                elNamaGuru.value = dataGlobal.lapNama || defaultNamaAkun;
+                elNamaGuru.onchange = function() {
+                    dataGlobal.lapNama = this.value;
+                    pushToCloud(true);
+                    showToast("Nama Guru berhasil diperbarui & disimpan!");
+                };
+            }
+            // ------------------------------
 
             renderIndukSiswa(); renderKegiatan(); renderNilai(); renderDashboardCharts(); renderAutoTasks();
             
@@ -1399,27 +1416,21 @@ footer {
             
             if(!dataGlobal.jadwalHistory) dataGlobal.jadwalHistory = [];
             
-            // Salin (kloning) jadwal dari periode terakhir agar guru tidak perlu mengetik ulang dari nol
-            let jadwalKloning = { "Senin":[], "Selasa":[], "Rabu":[], "Kamis":[], "Jumat":[], "Sabtu":[] };
-            if (dataGlobal.jadwalHistory.length > 0) {
-                const periodeTerakhir = dataGlobal.jadwalHistory[dataGlobal.jadwalHistory.length - 1];
-                jadwalKloning = JSON.parse(JSON.stringify(periodeTerakhir.jadwal || jadwalKloning));
-            } else if (dataGlobal.jadwalTetap) {
-                jadwalKloning = JSON.parse(JSON.stringify(dataGlobal.jadwalTetap));
-            }
+            // Jadwal dibuat BENAR-BENAR KOSONG (0 jadwal) sesuai permintaan
+            const jadwalKosong = { "Senin":[], "Selasa":[], "Rabu":[], "Kamis":[], "Jumat":[], "Sabtu":[] };
             
             dataGlobal.jadwalHistory.push({ 
                 id: Date.now(), 
                 label, 
                 tglMulai: mulai, 
                 tglSelesai: selesai, 
-                jadwal: jadwalKloning 
+                jadwal: jadwalKosong 
             });
             
             pushToCloud(true); 
             document.getElementById('per-label').value = ''; 
             pilihPeriode(dataGlobal.jadwalHistory[dataGlobal.jadwalHistory.length - 1].id, true); 
-            showToast("Periode berhasil dibuat & jadwal otomatis disalin!");
+            showToast("Periode baru berhasil dibuat dengan jadwal bersih!");
         };
 
         window.pilihPeriode = (id, silent=false) => {
@@ -1486,34 +1497,21 @@ footer {
             
             let periode = null;
 
-            // PRIORITAS 1: Jika ada Periode yang SEDANG AKTIF dipilih di Pengaturan Jadwal, prioritaskan itu
+            // PRIORITAS 1: Mutlak gunakan Periode yang sedang aktif/terpilih di Pengaturan Jadwal
             if (activePeriodeId && dataGlobal.jadwalHistory && dataGlobal.jadwalHistory.length > 0) {
-                const aktif = dataGlobal.jadwalHistory.find(p => p.id === activePeriodeId);
-                if (aktif && dateStr >= aktif.tglMulai && dateStr <= aktif.tglSelesai) {
-                    periode = aktif;
-                }
+                periode = dataGlobal.jadwalHistory.find(p => p.id === activePeriodeId);
             }
 
-            // PRIORITAS 2: Jika belum ketemu, cari dari riwayat periode TERBARU (urutan id terbesar ke terkecil)
+            // PRIORITAS 2: Jika belum ada yang dipilih, ambil periode terbaru (ID terbesar)
             if (!periode && dataGlobal.jadwalHistory && dataGlobal.jadwalHistory.length > 0) {
                 const historyTerbaru = [...dataGlobal.jadwalHistory].sort((a, b) => b.id - a.id);
-                periode = historyTerbaru.find(p => dateStr >= p.tglMulai && dateStr <= p.tglSelesai);
-            }
-
-            // PRIORITAS 3: Jika tanggal berada di luar rentang semua periode, gunakan Periode Aktif / Terbaru
-            if (!periode && dataGlobal.jadwalHistory && dataGlobal.jadwalHistory.length > 0) {
-                if (activePeriodeId) {
-                    periode = dataGlobal.jadwalHistory.find(p => p.id === activePeriodeId);
-                }
-                if (!periode) {
-                    periode = [...dataGlobal.jadwalHistory].sort((a, b) => b.id - a.id)[0];
-                }
+                periode = historyTerbaru.find(p => dateStr >= p.tglMulai && dateStr <= p.tglSelesai) || historyTerbaru[0];
             }
 
             // Ambil jadwal hari tersebut dari periode yang terpilih
             let jadwalHari = (periode && periode.jadwal && periode.jadwal[namaHari]) ? periode.jadwal[namaHari] : [];
             
-            // PRIORITAS 4 (Fallback): Jika jadwal di periode tersebut kosong, ambil dari jadwalTetap
+            // FALLBACK: Jika kosong, baru ambil dari jadwalTetap
             if ((!jadwalHari || jadwalHari.length === 0) && dataGlobal.jadwalTetap && dataGlobal.jadwalTetap[namaHari]) {
                 jadwalHari = dataGlobal.jadwalTetap[namaHari];
             }
@@ -1625,7 +1623,52 @@ footer {
 
         // === FUNGSI LAPORAN ===
         function tentukanVolumeDanSatuan(namaKegiatan, inputJp, manualSatuan) { if (manualSatuan && manualSatuan !== '') return { vol: inputJp || 1, sat: manualSatuan }; if (inputJp > 0) return { vol: inputJp, sat: 'JP' }; const kataDokumen = /laporan|dokumen|skp|rpp|modul|silabus|berkas|soal|kisi|rapor|jurnal/i; if (kataDokumen.test(namaKegiatan.toLowerCase())) return { vol: 1, sat: 'Dokumen' }; return { vol: 1, sat: 'Kegiatan' }; }
-        function getInfoPegawai() { return { nama: document.getElementById('lap-nama-guru').value || "-", nip: document.getElementById('lap-nip-guru').value || "-", unit: document.getElementById('lap-unit-kerja').value || "MAN 2 Kota Bekasi", org: document.getElementById('lap-unit-org').value || "Kemenag Kota Bekasi", kepsek: document.getElementById('lap-nama-kepsek').value || "..................", nipKepsek: document.getElementById('lap-nip-kepsek').value || "..................", jabatan: dataGlobal.lapJabatan || "Guru Mata Pelajaran" }; }
+        // 3. IDENTITAS PEGAWAI (Otomatis Deteksi Nama Pengguna & Mapel untuk Jabatan)
+        function getInfoPegawai() {
+            // Deteksi otomatis mata pelajaran dari jadwal aktif
+            let mapelSet = new Set();
+            let periodeAktif = null;
+            if (activePeriodeId && dataGlobal.jadwalHistory) {
+                periodeAktif = dataGlobal.jadwalHistory.find(p => p.id === activePeriodeId);
+            }
+            if (!periodeAktif && dataGlobal.jadwalHistory && dataGlobal.jadwalHistory.length > 0) {
+                periodeAktif = [...dataGlobal.jadwalHistory].sort((a,b) => b.id - a.id)[0];
+            }
+            const sumberJadwal = (periodeAktif && periodeAktif.jadwal) ? periodeAktif.jadwal : (dataGlobal.jadwalTetap || {});
+            
+            Object.values(sumberJadwal).forEach(listHari => {
+                if (Array.isArray(listHari)) {
+                    listHari.forEach(j => {
+                        if (j.mapel && j.mapel !== '-') mapelSet.add(j.mapel);
+                        else if (j.nama) {
+                            const clean = j.nama.split(/kelas/i)[0].trim();
+                            if (clean) mapelSet.add(clean);
+                        }
+                    });
+                }
+            });
+
+            const daftarMapel = Array.from(mapelSet).join(", ");
+            const autoJabatan = daftarMapel ? `Guru Mata Pelajaran ${daftarMapel}` : "Guru Mata Pelajaran";
+            
+            // Gunakan input jabatan jika diisi kustom, atau gunakan autoJabatan mapel
+            const inputJabatan = document.getElementById('lap-jabatan-guru').value.trim();
+            const finalJabatan = (inputJabatan && inputJabatan !== "Guru Mata Pelajaran") ? inputJabatan : autoJabatan;
+
+            // Prioritaskan Nama Kustom -> Nama Akun Firebase -> Kosong
+            const defaultNamaAkun = (auth.currentUser && auth.currentUser.displayName) ? auth.currentUser.displayName : "";
+            const namaGuru = document.getElementById('lap-nama-guru').value.trim() || dataGlobal.lapNama || defaultNamaAkun || "-";
+
+            return { 
+                nama: namaGuru, 
+                nip: document.getElementById('lap-nip-guru').value || "-", 
+                unit: document.getElementById('lap-unit-kerja').value || "MAN 2 Kota Bekasi", 
+                org: document.getElementById('lap-unit-org').value || "Kemenag Kota Bekasi", 
+                kepsek: document.getElementById('lap-nama-kepsek').value || "..................", 
+                nipKepsek: document.getElementById('lap-nip-kepsek').value || "..................", 
+                jabatan: finalJabatan 
+            };
+        }
 
       // 1. RENDER JURNAL KBM (Dinamis membaca semua mata pelajaran & kelas)
         window.renderJurnalKBM = (fromToggle = false) => {
