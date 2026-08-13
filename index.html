@@ -1097,6 +1097,7 @@ footer {
         window.backupDataLokal = () => { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataGlobal)); const btn = document.createElement('a'); btn.setAttribute("href", dataStr); btn.setAttribute("download", `Backup_SIGURU_${new Date().toISOString().split('T')[0]}.json`); document.body.appendChild(btn); btn.click(); btn.remove(); showToast("Backup Database berhasil diunduh."); };
         
         window.generatePDF = (elementId, filename) => { window.cetakPDFNative(elementId, filename); };
+        // 1. FIX NOTIFIKASI IKUT TERCETAK DI PDF
         window.cetakPDFNative = (elementId, filename) => { 
             const oldTitle = document.title; document.title = filename; 
             const mainApp = document.getElementById('main-app'); mainApp.style.display = 'none'; 
@@ -1105,7 +1106,8 @@ footer {
             clone.classList.remove('hidden', 'shadow-2xl', 'shadow-slate-200/50', 'rounded-[1.5rem]', 'md:rounded-[2rem]', 'border', 'border-slate-100', 'max-w-4xl', 'mx-auto', 'mb-10', 'overflow-x-auto', 'max-h-[600px]', 'overflow-y-auto');
             clone.style.width = '100%'; clone.style.margin = '0'; clone.style.padding = '0'; clone.style.overflow = 'visible'; clone.style.maxHeight = 'none';
             const pageOrientation = filename.includes('Rekap_Absensi') ? 'landscape' : 'auto';
-            const style = document.createElement('style'); style.innerHTML = `@media print { @page { size: ${pageOrientation}; margin: 15mm; } body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white !important; } #temp-print-container { overflow: visible !important; height: auto !important; max-height: none !important; } table:not(.table-ttd) { page-break-inside: auto !important; width: 100% !important; border-collapse: collapse !important; } tr { page-break-inside: avoid !important; page-break-after: auto !important; } table:not(.table-ttd) td, table:not(.table-ttd) th { page-break-inside: avoid !important; border: 1px solid black !important; padding: 6px !important; color: black !important; } .table-ttd, .table-ttd td, .table-ttd th, .table-ttd tr { border: none !important; } .html2pdf__page-break-avoid { page-break-inside: avoid !important; } * { color: black !important; } }`;
+            const style = document.createElement('style'); 
+            style.innerHTML = `@media print { @page { size: ${pageOrientation}; margin: 15mm; } body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white !important; } #temp-print-container { overflow: visible !important; height: auto !important; max-height: none !important; } table:not(.table-ttd) { page-break-inside: auto !important; width: 100% !important; border-collapse: collapse !important; } tr { page-break-inside: avoid !important; page-break-after: auto !important; } table:not(.table-ttd) td, table:not(.table-ttd) th { page-break-inside: avoid !important; border: 1px solid black !important; padding: 6px !important; color: black !important; } .table-ttd, .table-ttd td, .table-ttd th, .table-ttd tr { border: none !important; } .html2pdf__page-break-avoid { page-break-inside: avoid !important; } * { color: black !important; } #toast-container { display: none !important; } }`;
             printContainer.appendChild(style); printContainer.appendChild(clone); document.body.appendChild(printContainer);
             showToast("Mempersiapkan dokumen PDF..."); setTimeout(() => { window.print(); if(document.getElementById('temp-print-container')) { document.body.removeChild(printContainer); } mainApp.style.display = ''; document.title = oldTitle; }, 500);
         };
@@ -1368,11 +1370,40 @@ footer {
         };
 
         window.addKegiatan = () => { 
-            const kategori = document.getElementById('ek-kategori').value; const nama = document.getElementById('keg-nama').value; const tglAwal = document.getElementById('keg-tgl').value; const tglAkhir = document.getElementById('keg-tgl-akhir').value; const jp = parseFloat(document.getElementById('keg-jp').value) || 0; const satuan = document.getElementById('keg-satuan').value; const mulai = document.getElementById('keg-mulai').value; const selesai = document.getElementById('keg-selesai').value; const ket = document.getElementById('keg-ket').value;
+            // PERBAIKAN: Menggunakan ID 'keg-kategori' (form input), BUKAN 'ek-kategori' (form edit)
+            const kategori = document.getElementById('keg-kategori').value; 
+            const nama = document.getElementById('keg-nama').value; 
+            const tglAwal = document.getElementById('keg-tgl').value; 
+            const tglAkhir = document.getElementById('keg-tgl-akhir').value; 
+            const jp = parseFloat(document.getElementById('keg-jp').value) || 0; 
+            const satuan = document.getElementById('keg-satuan').value; 
+            const mulai = document.getElementById('keg-mulai').value; 
+            const selesai = document.getElementById('keg-selesai').value; 
+            const ket = document.getElementById('keg-ket').value;
+            
             if(!nama || !tglAwal) return showToast("Nama kegiatan dan Tanggal Mulai wajib diisi!", "warning"); 
-            let targetDates = [tglAwal]; if(tglAkhir && tglAkhir >= tglAwal) { targetDates = getDatesInRange(tglAwal, tglAkhir); }
-            targetDates.forEach(tglStr => { dataGlobal.kegiatan.push({ id: Date.now() + Math.random(), kategori, nama, tgl: tglStr, mulai, selesai, jp, satuan, ket, isFixed: false }); });
-            pushToCloud(true); document.getElementById('keg-nama').value = ''; document.getElementById('keg-ket').value = ''; document.getElementById('keg-jp').value = ''; document.getElementById('keg-satuan').value = ''; document.getElementById('keg-tgl-akhir').value = ''; showToast(`Kegiatan disimpan untuk ${targetDates.length} hari.`);
+            
+            let targetDates = [tglAwal]; 
+            if(tglAkhir && tglAkhir >= tglAwal) { targetDates = getDatesInRange(tglAwal, tglAkhir); }
+            
+            targetDates.forEach(tglStr => { 
+                dataGlobal.kegiatan.push({ id: Date.now() + Math.random(), kategori, nama, tgl: tglStr, mulai, selesai, jp, satuan, ket, isFixed: false }); 
+            });
+            
+            pushToCloud(true); 
+            
+            // Bersihkan form setelah disimpan
+            document.getElementById('keg-nama').value = ''; 
+            document.getElementById('keg-ket').value = ''; 
+            document.getElementById('keg-jp').value = ''; 
+            document.getElementById('keg-satuan').value = ''; 
+            document.getElementById('keg-tgl-akhir').value = ''; 
+            document.getElementById('keg-kategori').value = 'Tambahan'; // Reset dropdown kembali ke default
+            
+            showToast(`Kegiatan disimpan untuk ${targetDates.length} hari.`);
+            
+            // Update langsung tampilan riwayat kegiatan di layar
+            renderKegiatan();
         };
         
         window.getJadwalByDate = (dateStr) => {
@@ -1423,12 +1454,34 @@ footer {
             pushToCloud(true); document.getElementById('preview-hari').value = hari; document.getElementById('jt-jp').value = ''; document.getElementById('jt-jamke').value = ''; showToast("Jadwal Rutin Tersimpan"); renderJadwalTetap();
         };
 
+        // 2. FIX RIWAYAT KEGIATAN TUNDUK PADA PERIODE AKTIF
         window.renderKegiatan = () => { 
             const container = document.getElementById('kegiatan-container'); const filterBulan = document.getElementById('filter-tgl-kegiatan').value; container.innerHTML = ''; 
-            if(!dataGlobal.kegiatan || dataGlobal.kegiatan.length === 0) { container.innerHTML = '<p class="text-sm text-slate-400 font-medium">Belum ada riwayat kegiatan.</p>'; return; }
-            const sortedActivities = [...dataGlobal.kegiatan].sort((a,b) => new Date(b.tgl) - new Date(a.tgl));
+            
+            // Deteksi Periode Aktif
+            let pAktif = null;
+            if(activePeriodeId && dataGlobal.jadwalHistory) {
+                pAktif = dataGlobal.jadwalHistory.find(p => p.id === activePeriodeId);
+            }
+            
+            // Filter kegiatan berdasarkan tanggal mulai dan selesai periode aktif
+            let filteredKegiatan = dataGlobal.kegiatan || [];
+            if(pAktif) {
+                filteredKegiatan = filteredKegiatan.filter(k => k.tgl >= pAktif.tglMulai && k.tgl <= pAktif.tglSelesai);
+            }
+
+            if(!filteredKegiatan || filteredKegiatan.length === 0) { container.innerHTML = '<p class="text-sm text-slate-400 font-medium">Belum ada riwayat kegiatan di periode ini.</p>'; return; }
+            
+            const sortedActivities = [...filteredKegiatan].sort((a,b) => new Date(b.tgl) - new Date(a.tgl));
             let displayData = [];
-            if (filterBulan) { displayData = sortedActivities.filter(k => k.tgl.startsWith(filterBulan)); if (displayData.length === 0) { container.innerHTML = '<p class="text-xs text-red-400 font-bold p-4 bg-red-50 rounded-xl border border-dashed border-red-100 text-center">Tidak ada kegiatan pada bulan tersebut.</p>'; return; } } else { displayData = sortedActivities.slice(0, 10); }
+            
+            if (filterBulan) { 
+                displayData = sortedActivities.filter(k => k.tgl.startsWith(filterBulan)); 
+                if (displayData.length === 0) { container.innerHTML = '<p class="text-xs text-red-400 font-bold p-4 bg-red-50 rounded-xl border border-dashed border-red-100 text-center">Tidak ada kegiatan pada bulan tersebut.</p>'; return; } 
+            } else { 
+                displayData = sortedActivities.slice(0, 10); 
+            }
+            
             const grouped = {}; displayData.forEach(k => { const dateObj = new Date(k.tgl); const monthYear = namaBulanIndo[dateObj.getMonth()] + " " + dateObj.getFullYear(); if(!grouped[monthYear]) grouped[monthYear] = []; grouped[monthYear].push(k); });
             let html = '';
             for (const [monthYear, items] of Object.entries(grouped)) {
@@ -1568,6 +1621,7 @@ footer {
             document.getElementById('area-cetak-jurnal').classList.remove('hidden'); document.getElementById('area-cetak-jurnal').scrollIntoView({ behavior: 'smooth' }); showToast("Buku Jurnal Mengajar Berhasil Dimuat!");
         };
         
+        // 3A. FIX TABEL IDENTITAS LCKH
         window.generateLaporanLCKH = (mode) => {
             let dates = []; const info = getInfoPegawai();
             if(mode === 'harian') { const t = document.getElementById('lap-tgl').value; if(!t) return showToast("Pilih tanggal!", "warning"); dates = [t]; } else { const b = document.getElementById('lap-bulan-lckh').value; if(!b) return showToast("Pilih bulan!", "warning"); const [year, month] = b.split('-'); const days = new Date(year, month, 0).getDate(); for(let i=1; i<=days; i++) { const d = `${year}-${month}-${String(i).padStart(2,'0')}`; if(new Date(d).getDay() !== 0) dates.push(d); } }
@@ -1576,7 +1630,15 @@ footer {
                 const grouped = {}; dataLCKH.forEach(d => { if(!grouped[d.tglStr]) grouped[d.tglStr] = { tglIndo: d.tglIndo, items: [] }; grouped[d.tglStr].items.push(d); }); let html = '';
                 for(const tgl in grouped) {
                     const parts = tgl.split('-'); const tglTtd = `${parts[2]} ${namaBulanIndo[parseInt(parts[1])-1]} ${parts[0]}`;
-                    html += `<div class="mb-10 pb-4 html2pdf__page-break-avoid"><h1 class="text-base md:text-lg font-extrabold uppercase text-black text-center">LAPORAN CAPAIAN KINERJA HARIAN (LCKH)</h1><h2 class="text-sm font-bold text-black mb-4 text-center">Pegawai Negeri Sipil Kementerian Agama Kota Bekasi</h2><table class="text-left text-xs md:text-sm mb-4 w-full text-black table-ttd" style="border:none !important;"><tr style="border:none !important;"><td class="pr-2 py-0.5 w-32" style="border:none !important;">Nama</td><td style="border:none !important; width:10px;">:</td><td class="font-bold" style="border:none !important;">${info.nama}</td></tr><tr style="border:none !important;"><td class="pr-2 py-0.5" style="border:none !important;">Jabatan</td><td style="border:none !important;">:</td><td class="font-bold" style="border:none !important;">${info.jabatan}</td></tr><tr style="border:none !important;"><td class="pr-2 py-0.5" style="border:none !important;">Unit Kerja</td><td style="border:none !important;">:</td><td class="font-bold" style="border:none !important;">${info.unit}</td></tr><tr style="border:none !important;"><td class="pr-2 py-0.5" style="border:none !important;">Unit Organisasi</td><td style="border:none !important;">:</td><td class="font-bold" style="border:none !important;">${info.org}</td></tr><tr style="border:none !important;"><td class="pr-2 py-0.5" style="border:none !important;">Hari/Tanggal</td><td style="border:none !important;">:</td><td class="font-bold" style="border:none !important;">${grouped[tgl].tglIndo}</td></tr></table><table class="w-full border-collapse border border-black text-xs md:text-sm text-black mb-6"><thead class="text-black bg-slate-100"><tr><th class="border border-black p-2 text-center w-10 font-bold">No</th><th class="border border-black p-2 font-bold text-center">Uraian Kegiatan</th><th class="border border-black p-2 text-center w-24 font-bold">Output</th><th class="border border-black p-2 text-center w-20 font-bold">Volume</th><th class="border border-black p-2 text-center w-24 font-bold">Satuan</th><th class="border border-black p-2 text-center w-24 font-bold">Ket</th></tr></thead><tbody>`;
+                    html += `<div class="mb-10 pb-4 html2pdf__page-break-avoid"><h1 class="text-base md:text-lg font-extrabold uppercase text-black text-center">LAPORAN CAPAIAN KINERJA HARIAN (LCKH)</h1><h2 class="text-sm font-bold text-black mb-4 text-center">Pegawai Negeri Sipil Kementerian Agama Kota Bekasi</h2>
+                    <table class="text-left text-sm mb-6 text-black table-ttd" style="border:none !important; width: 75%; line-height: 1.4;">
+                        <tr style="border:none !important;"><td style="border:none !important; width:130px; padding:2px 0;">Nama</td><td style="border:none !important; width:15px; padding:2px 0;">:</td><td class="font-bold" style="border:none !important; padding:2px 0;">${info.nama}</td></tr>
+                        <tr style="border:none !important;"><td style="border:none !important; padding:2px 0;">Jabatan</td><td style="border:none !important; padding:2px 0;">:</td><td class="font-bold" style="border:none !important; padding:2px 0;">${info.jabatan}</td></tr>
+                        <tr style="border:none !important;"><td style="border:none !important; padding:2px 0;">Unit Kerja</td><td style="border:none !important; padding:2px 0;">:</td><td class="font-bold" style="border:none !important; padding:2px 0;">${info.unit}</td></tr>
+                        <tr style="border:none !important;"><td style="border:none !important; padding:2px 0;">Unit Organisasi</td><td style="border:none !important; padding:2px 0;">:</td><td class="font-bold" style="border:none !important; padding:2px 0;">${info.org}</td></tr>
+                        <tr style="border:none !important;"><td style="border:none !important; padding:2px 0;">Hari/Tanggal</td><td style="border:none !important; padding:2px 0;">:</td><td class="font-bold" style="border:none !important; padding:2px 0;">${grouped[tgl].tglIndo}</td></tr>
+                    </table>
+                    <table class="w-full border-collapse border border-black text-xs md:text-sm text-black mb-6"><thead class="text-black bg-slate-100"><tr><th class="border border-black p-2 text-center w-10 font-bold">No</th><th class="border border-black p-2 font-bold text-center">Uraian Kegiatan</th><th class="border border-black p-2 text-center w-24 font-bold">Output</th><th class="border border-black p-2 text-center w-20 font-bold">Volume</th><th class="border border-black p-2 text-center w-24 font-bold">Satuan</th><th class="border border-black p-2 text-center w-24 font-bold">Ket</th></tr></thead><tbody>`;
                     grouped[tgl].items.forEach((item, idx) => { html += `<tr><td class="border border-black p-2 text-center align-top">${idx+1}</td><td class="border border-black p-2 whitespace-pre-wrap align-top">${item.uraian}</td><td class="border border-black p-2 text-center align-top">${item.output}</td><td class="border border-black p-2 text-center align-top">${item.vol}</td><td class="border border-black p-2 text-center align-top">${item.sat}</td><td class="border border-black p-2 align-top">${item.ket}</td></tr>`; });
                     let imgHtmlGuru = dataGlobal.ttd ? `<img src="${dataGlobal.ttd}" style="max-width:120px; max-height:70px; object-fit:contain; mix-blend-mode:multiply; margin-top:5px; margin-bottom:5px;">` : `<br><br><br><br>`;
                     let imgHtmlKepsek = dataGlobal.ttdKepsek ? `<img src="${dataGlobal.ttdKepsek}" style="max-width:120px; max-height:70px; object-fit:contain; mix-blend-mode:multiply; margin-top:5px; margin-bottom:5px;">` : `<br><br><br><br>`;
@@ -1589,6 +1651,7 @@ footer {
             document.getElementById('area-cetak-laporan').classList.remove('hidden'); document.getElementById('area-cetak-laporan').scrollIntoView({ behavior: 'smooth' }); showToast("Laporan LCKH Berhasil Dimuat!");
         };
 
+        // 3B. FIX TABEL IDENTITAS LKB
         window.generateLaporanLKB = () => {
             const b = document.getElementById('lap-bulan-lkb').value; if(!b) return showToast("Pilih bulan LKB!", "warning");
             const [year, month] = b.split('-'); const tglTtd = `${new Date(year, month, 0).getDate()} ${namaBulanIndo[parseInt(month)-1]} ${year}`;
@@ -1603,7 +1666,14 @@ footer {
             kegiatanBulanan.forEach(k => { const oto = tentukanVolumeDanSatuan(k.nama, k.jp, k.satuan); let cleanNama = k.nama.trim(); let key = `${k.kategori}_${cleanNama}`; if(!recapKegiatan[key]) { recapKegiatan[key] = { kategori: k.kategori, uraian: cleanNama, output: "Terlaksana", vol: oto.vol, sat: oto.sat, ket: k.ket }; } else { recapKegiatan[key].vol += oto.vol; } });
             Object.values(recapKegiatan).forEach(obj => { if(obj.kategori === 'Utama') tugasUtama.push(obj); else if(obj.kategori === 'Pelatihan') tugasPelatihan.push(obj); else tugasTambahan.push(obj); });
             const info = getInfoPegawai(); const container = document.getElementById('print-content-lkb');
-            let html = `<div class="text-center mb-6 text-black" style="font-family: Arial, sans-serif;"><h1 class="text-lg md:text-xl font-extrabold uppercase">LAPORAN KINERJA BULANAN (LKB)</h1><h2 class="text-sm md:text-base font-bold mt-1">Aparatur Sipil Negara Kementerian Agama Kota Bekasi</h2><h3 class="text-xs md:text-sm font-bold mt-1">Bulan : ${namaBulanIndo[parseInt(month)-1]} ${year}</h3></div><table class="text-left text-xs md:text-sm mb-6 w-full text-black table-ttd" style="border:none !important;"><tr style="border:none !important;"><td class="py-1 w-32 font-bold" style="border:none !important;">Nama</td><td style="border:none !important; width:10px;">:</td><td class="font-bold" style="border:none !important;">${info.nama}</td></tr><tr style="border:none !important;"><td class="py-1 font-bold" style="border:none !important;">Jabatan</td><td style="border:none !important;">:</td><td class="font-semibold" style="border:none !important;">${info.jabatan}</td></tr><tr style="border:none !important;"><td class="py-1 font-bold" style="border:none !important;">Unit Kerja</td><td style="border:none !important;">:</td><td class="font-semibold" style="border:none !important;">${info.unit}</td></tr><tr style="border:none !important;"><td class="py-1 font-bold" style="border:none !important;">Unit Organisasi</td><td style="border:none !important;">:</td><td class="font-semibold" style="border:none !important;">${info.org}</td></tr></table><table class="w-full border-collapse border border-black text-xs md:text-sm text-black mb-8"><thead class="bg-slate-100"><tr><th class="border border-black p-2 text-center w-10 font-bold">No</th><th class="border border-black p-2 text-center font-bold">Uraian Kegiatan</th><th class="border border-black p-2 text-center w-24 font-bold">Output</th><th class="border border-black p-2 text-center w-16 font-bold">Volume</th><th class="border border-black p-2 text-center w-20 font-bold">Satuan</th><th class="border border-black p-2 text-center w-24 font-bold">Ket</th></tr></thead><tbody>`;
+            let html = `<div class="text-center mb-6 text-black" style="font-family: Arial, sans-serif;"><h1 class="text-lg md:text-xl font-extrabold uppercase">LAPORAN KINERJA BULANAN (LKB)</h1><h2 class="text-sm md:text-base font-bold mt-1">Aparatur Sipil Negara Kementerian Agama Kota Bekasi</h2><h3 class="text-xs md:text-sm font-bold mt-1">Bulan : ${namaBulanIndo[parseInt(month)-1]} ${year}</h3></div>
+            <table class="text-left text-sm mb-6 text-black table-ttd" style="border:none !important; width: 75%; line-height: 1.4;">
+                <tr style="border:none !important;"><td style="border:none !important; width:130px; padding:2px 0;">Nama</td><td style="border:none !important; width:15px; padding:2px 0;">:</td><td class="font-bold" style="border:none !important; padding:2px 0;">${info.nama}</td></tr>
+                <tr style="border:none !important;"><td style="border:none !important; padding:2px 0;">Jabatan</td><td style="border:none !important; padding:2px 0;">:</td><td class="font-bold" style="border:none !important; padding:2px 0;">${info.jabatan}</td></tr>
+                <tr style="border:none !important;"><td style="border:none !important; padding:2px 0;">Unit Kerja</td><td style="border:none !important; padding:2px 0;">:</td><td class="font-bold" style="border:none !important; padding:2px 0;">${info.unit}</td></tr>
+                <tr style="border:none !important;"><td style="border:none !important; padding:2px 0;">Unit Organisasi</td><td style="border:none !important; padding:2px 0;">:</td><td class="font-bold" style="border:none !important; padding:2px 0;">${info.org}</td></tr>
+            </table>
+            <table class="w-full border-collapse border border-black text-xs md:text-sm text-black mb-8"><thead class="bg-slate-100"><tr><th class="border border-black p-2 text-center w-10 font-bold">No</th><th class="border border-black p-2 text-center font-bold">Uraian Kegiatan</th><th class="border border-black p-2 text-center w-24 font-bold">Output</th><th class="border border-black p-2 text-center w-16 font-bold">Volume</th><th class="border border-black p-2 text-center w-20 font-bold">Satuan</th><th class="border border-black p-2 text-center w-24 font-bold">Ket</th></tr></thead><tbody>`;
             const renderSect = (title, items) => { html += `<tr><td colspan="6" class="border border-black p-2 font-extrabold bg-slate-50 text-black">${title}</td></tr>`; if(items.length === 0) html += `<tr><td colspan="6" class="border border-black p-2 text-center italic text-black">Nihil</td></tr>`; else items.forEach((t, i) => { html += `<tr><td class="border border-black p-2 text-center align-top">${i+1}</td><td class="border border-black p-2 align-top">${t.uraian}</td><td class="border border-black p-2 text-center align-top">${t.output}</td><td class="border border-black p-2 text-center align-top">${t.vol}</td><td class="border border-black p-2 text-center align-top">${t.sat}</td><td class="border border-black p-2 text-xs align-top">${t.ket}</td></tr>`; }); };
             renderSect('A. TUGAS UTAMA', tugasUtama); renderSect('B. TUGAS TAMBAHAN', tugasTambahan); renderSect('C. PELATIHAN', tugasPelatihan);
             let imgHtmlGuru = dataGlobal.ttd ? `<img src="${dataGlobal.ttd}" style="max-width:120px; max-height:70px; object-fit:contain; mix-blend-mode:multiply; margin-top:5px; margin-bottom:5px;">` : `<br><br><br><br>`;
@@ -1657,24 +1727,58 @@ footer {
                     let mapelKBM = {};
                     dataLCKH.filter(d => d.uraian.includes('Melaksanakan KBM')).forEach(d => { const match = d.uraian.match(/Melaksanakan KBM(?: Tambahan)?: (.*?)(?:\n|$)/); const namaKelasMapel = match ? match[1].trim() : "Kegiatan Belajar Mengajar"; mapelKBM[namaKelasMapel] = (mapelKBM[namaKelasMapel] || 0) + parseFloat(d.vol||0); });
                     if(Object.keys(mapelKBM).length > 0) { Object.entries(mapelKBM).forEach(([m, jp]) => { tugasUtama.push({ uraian: `${m} : Kegiatan Belajar Mengajar`, output: "Terlaksana", vol: jp, sat: "JP", ket: "" }); }); }
-                    if(dataGlobal.autoTasks) dataGlobal.autoTasks.forEach(at => { tugasUtama.push({ uraian: at.nama, output: "Terlaksana", vol: at.vol, sat: at.sat, ket: "" }); });
-                    kegiatanBulanan.forEach(k => { const oto = tentukanVolumeDanSatuan(k.nama, k.jp, k.satuan); let cleanNama = k.nama.trim(); if(k.kategori === 'Utama') tugasUtama.push({ uraian: cleanNama, output: "Terlaksana", vol: oto.vol, sat: oto.sat, ket: k.ket }); else if(k.kategori === 'Pelatihan') tugasPelatihan.push({ uraian: cleanNama, output: "Terlaksana", vol: oto.vol, sat: oto.sat, ket: k.ket }); else tugasTambahan.push({ uraian: cleanNama, output: "Terlaksana", vol: oto.vol, sat: oto.sat, ket: k.ket }); });
-                    ws.columns = [ {width: 6}, {width: 55}, {width: 15}, {width: 12}, {width: 12}, {width: 20} ];
-                    ws.mergeCells('A1:F1'); ws.getCell('A1').value = 'LAPORAN KINERJA BULANAN (LKB)'; ws.getCell('A1').font = fontTitle; ws.getCell('A1').alignment = { horizontal: 'center' };
-                    ws.mergeCells('A2:F2'); ws.getCell('A2').value = 'Aparatur Sipil Negara Kementerian Agama Kota Bekasi'; ws.getCell('A2').font = fontBold; ws.getCell('A2').alignment = { horizontal: 'center' };
-                    ws.mergeCells('A3:F3'); ws.getCell('A3').value = `Bulan  :  ${namaBulanIndo[parseInt(month)-1]} ${year}`; ws.getCell('A3').font = fontBold; ws.getCell('A3').alignment = { horizontal: 'center' };
+                    if(dataGlobal.autoTasks && dataGlobal.autoTasks.length > 0) { dataGlobal.autoTasks.forEach(at => { tugasUtama.push({ uraian: at.nama, output: "Terlaksana", vol: at.vol, sat: at.sat, ket: "" }); }); }
+                    let recapKegiatan = {};
+                    kegiatanBulanan.forEach(k => { const oto = tentukanVolumeDanSatuan(k.nama, k.jp, k.satuan); let cleanNama = k.nama.trim(); let key = `${k.kategori}_${cleanNama}`; if(!recapKegiatan[key]) { recapKegiatan[key] = { kategori: k.kategori, uraian: cleanNama, output: "Terlaksana", vol: oto.vol, sat: oto.sat, ket: k.ket }; } else { recapKegiatan[key].vol += oto.vol; } });
+                    Object.values(recapKegiatan).forEach(obj => { if(obj.kategori === 'Utama') tugasUtama.push(obj); else if(obj.kategori === 'Pelatihan') tugasPelatihan.push(obj); else tugasTambahan.push(obj); });
+                    
+                    // PENYESUAIAN STRUKTUR KOLOM MENJADI 8 KOLOM (SAMA PERSIS DENGAN LCKH)
+                    ws.columns = [ {width: 5}, {width: 15}, {width: 15}, {width: 15}, {width: 15}, {width: 10}, {width: 10}, {width: 20} ];
+                    ws.mergeCells('A1:H1'); ws.getCell('A1').value = 'LAPORAN KINERJA BULANAN (LKB)'; ws.getCell('A1').font = fontTitle; ws.getCell('A1').alignment = { horizontal: 'center' };
+                    ws.mergeCells('A2:H2'); ws.getCell('A2').value = 'Aparatur Sipil Negara Kementerian Agama Kota Bekasi'; ws.getCell('A2').font = fontBold; ws.getCell('A2').alignment = { horizontal: 'center' };
+                    ws.mergeCells('A3:H3'); ws.getCell('A3').value = `Bulan  :  ${namaBulanIndo[parseInt(month)-1]} ${year}`; ws.getCell('A3').font = fontBold; ws.getCell('A3').alignment = { horizontal: 'center' };
+                    
                     let currentRow = 5;
-                    ws.mergeCells(`B${currentRow}:C${currentRow}`); ws.getCell(`B${currentRow}`).value = 'Nama'; ws.getCell(`D${currentRow}`).value = ':'; ws.getCell(`D${currentRow}`).alignment={horizontal:'center'}; ws.mergeCells(`E${currentRow}:F${currentRow}`); ws.getCell(`E${currentRow}`).value = info.nama; ws.getCell(`E${currentRow}`).font = fontBold; currentRow++;
-                    ws.mergeCells(`B${currentRow}:C${currentRow}`); ws.getCell(`B${currentRow}`).value = 'Jabatan'; ws.getCell(`D${currentRow}`).value = ':'; ws.getCell(`D${currentRow}`).alignment={horizontal:'center'}; ws.mergeCells(`E${currentRow}:F${currentRow}`); ws.getCell(`E${currentRow}`).value = info.jabatan; currentRow++;
-                    ws.mergeCells(`B${currentRow}:C${currentRow}`); ws.getCell(`B${currentRow}`).value = 'Unit Kerja'; ws.getCell(`D${currentRow}`).value = ':'; ws.getCell(`D${currentRow}`).alignment={horizontal:'center'}; ws.mergeCells(`E${currentRow}:F${currentRow}`); ws.getCell(`E${currentRow}`).value = info.unit; currentRow++;
-                    ws.mergeCells(`B${currentRow}:C${currentRow}`); ws.getCell(`B${currentRow}`).value = 'Unit Organisasi'; ws.getCell(`D${currentRow}`).value = ':'; ws.getCell(`D${currentRow}`).alignment={horizontal:'center'}; ws.mergeCells(`E${currentRow}:F${currentRow}`); ws.getCell(`E${currentRow}`).value = info.org; currentRow += 2;
-                    const headerRow = ws.getRow(currentRow); headerRow.values = ['No', 'Uraian Kegiatan', 'Output', 'Volume', 'Satuan', 'Ket']; headerRow.eachCell(c => { c.font = fontHeader; c.border = borderAll; c.alignment = {horizontal:'center', vertical:'middle'}; c.fill = fillHeader; }); currentRow++;
-                    const renderSect = (title, items) => { const row = ws.getRow(currentRow); row.values = [title, '', '', '', '', '']; ws.mergeCells(`A${currentRow}:F${currentRow}`); row.getCell(1).font = fontBold; row.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEEEEEE' } }; row.eachCell(c => { c.border = borderAll; }); currentRow++; if(items.length === 0) { const r = ws.getRow(currentRow); r.values = ['', 'Nihil', '', '', '', '']; ws.mergeCells(`B${currentRow}:F${currentRow}`); r.getCell(2).font = { italic: true, name: 'Arial', size: 10 }; r.eachCell(c => { c.border = borderAll; c.alignment = {horizontal: 'center'} }); currentRow++; } else { const mergedItems = {}; items.forEach(t => { if(mergedItems[t.uraian]) { mergedItems[t.uraian].vol += t.vol; } else { mergedItems[t.uraian] = { ...t }; } }); Object.values(mergedItems).forEach((t, i) => { const r = ws.getRow(currentRow); r.values = [i + 1, t.uraian, t.output, t.vol, t.sat, t.ket]; r.eachCell((c, colNum) => { c.font = fontNormal; c.border = borderAll; c.alignment = { vertical: 'top', wrapText: true }; if (colNum !== 2 && colNum !== 6) c.alignment.horizontal = 'center'; }); currentRow++; }); } };
+                    ws.getCell(`A${currentRow}`).value = 'Nama'; ws.getCell(`C${currentRow}`).value = ':'; ws.getCell(`C${currentRow}`).alignment={horizontal:'center'}; ws.mergeCells(`D${currentRow}:H${currentRow}`); ws.getCell(`D${currentRow}`).value = info.nama; ws.getCell(`D${currentRow}`).font = fontBold; currentRow++;
+                    ws.getCell(`A${currentRow}`).value = 'Jabatan'; ws.getCell(`C${currentRow}`).value = ':'; ws.getCell(`C${currentRow}`).alignment={horizontal:'center'}; ws.mergeCells(`D${currentRow}:H${currentRow}`); ws.getCell(`D${currentRow}`).value = info.jabatan; currentRow++;
+                    ws.getCell(`A${currentRow}`).value = 'Unit Kerja'; ws.getCell(`C${currentRow}`).value = ':'; ws.getCell(`C${currentRow}`).alignment={horizontal:'center'}; ws.mergeCells(`D${currentRow}:H${currentRow}`); ws.getCell(`D${currentRow}`).value = info.unit; currentRow++;
+                    ws.getCell(`A${currentRow}`).value = 'Unit Organisasi'; ws.getCell(`C${currentRow}`).value = ':'; ws.getCell(`C${currentRow}`).alignment={horizontal:'center'}; ws.mergeCells(`D${currentRow}:H${currentRow}`); ws.getCell(`D${currentRow}`).value = info.org; currentRow += 2;
+                    
+                    const headerRow = ws.getRow(currentRow); 
+                    headerRow.values = ['No', 'Uraian Kegiatan', '', '', 'Output', 'Volume', 'Satuan', 'Ket']; 
+                    ws.mergeCells(`B${currentRow}:D${currentRow}`);
+                    headerRow.eachCell(c => { c.font = fontHeader; c.border = borderAll; c.alignment = {horizontal:'center', vertical:'middle'}; c.fill = fillHeader; }); 
+                    currentRow++;
+
+                    const renderSect = (title, items) => { 
+                        const row = ws.getRow(currentRow); row.values = [title, '', '', '', '', '', '', '']; ws.mergeCells(`A${currentRow}:H${currentRow}`); 
+                        row.getCell(1).font = fontBold; row.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEEEEEE' } }; 
+                        row.eachCell(c => { c.border = borderAll; }); currentRow++; 
+                        if(items.length === 0) { 
+                            const r = ws.getRow(currentRow); r.values = ['', 'Nihil', '', '', '', '', '', '']; ws.mergeCells(`B${currentRow}:H${currentRow}`); 
+                            r.getCell(2).font = { italic: true, name: 'Arial', size: 10 }; r.eachCell(c => { c.border = borderAll; c.alignment = {horizontal: 'center'} }); currentRow++; 
+                        } else { 
+                            const mergedItems = {}; 
+                            items.forEach(t => { if(mergedItems[t.uraian]) { mergedItems[t.uraian].vol += t.vol; } else { mergedItems[t.uraian] = { ...t }; } }); 
+                            Object.values(mergedItems).forEach((t, i) => { 
+                                const r = ws.getRow(currentRow); r.values = [i + 1, t.uraian, '', '', t.output, t.vol, t.sat, t.ket]; 
+                                ws.mergeCells(`B${currentRow}:D${currentRow}`);
+                                r.eachCell((c, colNum) => { c.font = fontNormal; c.border = borderAll; c.alignment = { vertical: 'top', wrapText: true }; if (colNum !== 2 && colNum !== 3 && colNum !== 4 && colNum !== 8) c.alignment.horizontal = 'center'; }); 
+                                currentRow++; 
+                            }); 
+                        } 
+                    };
                     renderSect('A. TUGAS UTAMA', tugasUtama); renderSect('B. TUGAS TAMBAHAN', tugasTambahan); renderSect('C. PELATIHAN', tugasPelatihan);
-                    currentRow += 3; ws.getCell(`E${currentRow}`).value = `Bekasi, ${tglTtd}`; currentRow++; ws.getCell(`B${currentRow}`).value = 'Mengetahui,'; currentRow++; ws.getCell(`B${currentRow}`).value = titleKepsek; ws.getCell(`E${currentRow}`).value = 'Pegawai yang dinilai'; currentRow += 5;
-                    if(imageIdKepsek) { ws.addImage(imageIdKepsek, { tl: { col: 1, row: currentRow - 4 }, ext: { width: 120, height: 70 } }); } if(imageId) { ws.addImage(imageId, { tl: { col: 4, row: currentRow - 4 }, ext: { width: 120, height: 70 } }); }
-                    ws.getCell(`B${currentRow}`).value = info.kepsek; ws.getCell(`E${currentRow}`).value = info.nama; ws.getCell(`B${currentRow}`).font = {name:'Arial', size:10, bold:true, underline:true}; ws.getCell(`E${currentRow}`).font = {name:'Arial', size:10, bold:true, underline:true}; currentRow++;
-                    ws.getCell(`B${currentRow}`).value = `NIP. ${info.nipKepsek}`; ws.getCell(`E${currentRow}`).value = `NIP. ${info.nip}`;
+                    
+                    currentRow += 3; 
+                    ws.getCell(`F${currentRow}`).value = `Bekasi, ${tglTtd}`; currentRow++; 
+                    ws.getCell(`B${currentRow}`).value = 'Mengetahui,'; currentRow++; 
+                    ws.getCell(`B${currentRow}`).value = titleKepsek; ws.getCell(`F${currentRow}`).value = 'Pegawai yang dinilai'; currentRow += 5;
+                    if(imageIdKepsek) { ws.addImage(imageIdKepsek, { tl: { col: 1, row: currentRow - 4 }, ext: { width: 120, height: 70 } }); } 
+                    if(imageId) { ws.addImage(imageId, { tl: { col: 5, row: currentRow - 4 }, ext: { width: 120, height: 70 } }); }
+                    ws.getCell(`B${currentRow}`).value = info.kepsek; ws.getCell(`F${currentRow}`).value = info.nama; 
+                    ws.getCell(`B${currentRow}`).font = {name:'Arial', size:10, bold:true, underline:true}; ws.getCell(`F${currentRow}`).font = {name:'Arial', size:10, bold:true, underline:true}; currentRow++;
+                    ws.getCell(`B${currentRow}`).value = `NIP. ${info.nipKepsek}`; ws.getCell(`F${currentRow}`).value = `NIP. ${info.nip}`;
                 }
 
                 if(type === 'rekap-absensi') {
