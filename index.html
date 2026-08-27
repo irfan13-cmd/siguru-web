@@ -372,7 +372,37 @@ footer {
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased overflow-x-hidden selection:bg-indigo-100 selection:text-indigo-900 relative">
-
+    <!-- MODAL HAPUS MASSAL DENGAN SUGGESTION -->
+        <div id="modal-hapus-massal" class="fixed inset-0 z-50 hidden bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
+                <div class="p-4 md:p-5 border-b border-slate-100 flex justify-between items-center bg-red-50">
+                    <h3 class="font-extrabold text-red-600 text-sm md:text-base flex items-center gap-2">
+                        <i data-lucide="alert-triangle" class="w-5 h-5"></i> Hapus Massal Jadwal Rutin
+                    </h3>
+                    <button onclick="tutupModalHapusMassal()" class="text-slate-400 hover:text-red-500 transition-colors">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+                <div class="p-4 md:p-5">
+                    <p class="text-xs md:text-sm text-slate-500 mb-4 font-medium">Klik pada kolom untuk melihat daftar, atau ketik nama kegiatan yang ingin dihapus. <span class="font-bold text-red-500">Semua jadwal dengan nama ini akan dihapus!</span></p>
+                    
+                    <label class="text-[10px] md:text-[11px] font-extrabold text-slate-500 mb-1.5 block uppercase tracking-wider">Pilih / Ketik Nama Kegiatan</label>
+                    
+                    <!-- Fitur Suggestion / Datalist -->
+                    <input list="list-kegiatan-massal" id="input-hapus-massal" placeholder="Contoh: Upacara Bendera..." class="w-full border border-slate-200 p-3 rounded-xl bg-white outline-none focus:border-red-500 font-bold text-slate-700 text-sm mb-2">
+                    <datalist id="list-kegiatan-massal">
+                        <!-- Opsi akan otomatis dimuat oleh JavaScript -->
+                    </datalist>
+                    
+                </div>
+                <div class="p-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-2">
+                    <button onclick="tutupModalHapusMassal()" class="px-4 py-2 text-xs md:text-sm font-bold text-slate-600 hover:bg-slate-200 rounded-lg transition-colors">Batal</button>
+                    <button onclick="eksekusiHapusMassal()" class="px-4 py-2 text-xs md:text-sm font-bold bg-red-600 text-white hover:bg-red-700 rounded-lg transition-colors shadow-md flex items-center gap-2">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i> Hapus Semua
+                    </button>
+                </div>
+            </div>
+        </div>
     <div id="toast-container" class="fixed top-5 right-5 z-[9999] flex flex-col gap-3 pointer-events-none"></div>
 
     <div id="auth-page" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-100 via-indigo-50 to-slate-200 p-4 relative overflow-hidden">
@@ -624,10 +654,14 @@ footer {
                             <div class="space-y-4 bg-slate-50 p-4 md:p-5 rounded-2xl border border-slate-100 mb-5 relative z-0">
                                 <div><label class="text-[10px] md:text-[11px] font-extrabold text-indigo-600 mb-1.5 block uppercase tracking-wider">Kategori Laporan (Penting untuk LKB)</label><select id="keg-kategori" class="w-full border border-indigo-200 p-3 rounded-xl bg-indigo-50 outline-none focus:border-indigo-500 font-extrabold text-indigo-700 text-sm"><option value="Tambahan">Tugas Tambahan (Mengawas, Rapat, Apel, dll)</option><option value="Utama">Tugas Utama (Waka, Wali Kelas, Pembina, dll)</option><option value="Pelatihan">Pelatihan / Seminar</option></select></div>
                                 <div><label class="text-[10px] md:text-[11px] font-extrabold text-slate-500 mb-1.5 block uppercase tracking-wider">Nama Kegiatan / Tugas</label><input type="text" id="keg-nama" placeholder="Cth: Rapat Kelulusan" class="w-full border border-slate-200 p-3 rounded-xl bg-white outline-none focus:border-blue-500 font-bold text-slate-700 text-sm"></div>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3"><div><label class="text-[10px] md:text-[11px] font-extrabold text-slate-500 mb-1.5 block uppercase tracking-wider">Tanggal Mulai</label><input type="date" id="keg-tgl" class="w-full border border-slate-200 p-3 rounded-xl bg-white outline-none focus:border-blue-500 font-bold text-slate-700 text-sm"></div><div><label class="text-[10px] md:text-[11px] font-extrabold text-slate-500 mb-1.5 block uppercase tracking-wider">Sampai Tanggal (Multi-Hari)</label><input type="date" id="keg-tgl-akhir" class="w-full border border-slate-200 p-3 rounded-xl bg-white outline-none focus:border-blue-500 font-bold text-slate-700 text-sm"></div></div>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                <div><label class="text-[10px] md:text-[11px] font-extrabold text-slate-500 mb-1.5 block uppercase tracking-wider">Tgl Mulai</label><input type="date" id="keg-tgl" class="w-full border border-slate-200 p-3 rounded-xl bg-white outline-none focus:border-blue-500 font-bold text-slate-700 text-sm"></div>
+                                <div><label class="text-[10px] md:text-[11px] font-extrabold text-slate-500 mb-1.5 block uppercase tracking-wider">Tgl Akhir / Batas</label><input type="date" id="keg-tgl-akhir" class="w-full border border-slate-200 p-3 rounded-xl bg-white outline-none focus:border-blue-500 font-bold text-slate-700 text-sm"></div>
+                                <div><label class="text-[10px] md:text-[11px] font-extrabold text-indigo-600 mb-1.5 block uppercase tracking-wider">Perulangan</label><select id="keg-ulang" class="w-full border border-indigo-200 p-3 rounded-xl bg-indigo-50 outline-none focus:border-blue-500 font-extrabold text-indigo-700 text-sm"><option value="none">Satu Kali / Multi-Hari</option><option value="harian">Rutin Harian</option><option value="mingguan">Rutin Mingguan</option><option value="bulanan">Rutin Bulanan</option></select></div>
+                            </div>
                                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3"><div><label class="text-[10px] md:text-[11px] font-extrabold text-slate-500 mb-1.5 block uppercase tracking-wider">Mulai Jam</label><input type="time" id="keg-mulai" class="w-full border border-slate-200 p-3 rounded-xl bg-white outline-none focus:border-blue-500 font-bold text-slate-700 text-sm"></div><div><label class="text-[10px] md:text-[11px] font-extrabold text-slate-500 mb-1.5 block uppercase tracking-wider">Selesai</label><input type="time" id="keg-selesai" class="w-full border border-slate-200 p-3 rounded-xl bg-white outline-none focus:border-blue-500 font-bold text-slate-700 text-sm"></div><div><label class="text-[10px] md:text-[11px] font-extrabold text-slate-500 mb-1.5 block uppercase tracking-wider">Nilai Vol</label><input type="number" id="keg-jp" placeholder="1" class="w-full border border-slate-200 p-3 rounded-xl bg-white outline-none focus:border-blue-500 text-center font-bold text-slate-700 text-sm"></div><div><label class="text-[10px] md:text-[11px] font-extrabold text-slate-500 mb-1.5 block uppercase tracking-wider">Satuan</label><select id="keg-satuan" class="w-full border border-slate-200 p-3 rounded-xl bg-white outline-none focus:border-blue-500 font-bold text-slate-700 text-sm"><option value="">Otomatis</option><option value="Kegiatan">Kegiatan</option><option value="Dokumen">Dokumen</option><option value="Laporan">Laporan</option><option value="JP">JP</option></select></div></div>
                                 <div><label class="text-[10px] md:text-[11px] font-extrabold text-slate-500 mb-1.5 block uppercase tracking-wider">Keterangan / Output</label><textarea id="keg-ket" placeholder="Dokumen Bukti Fisik / Terlaksana..." class="w-full border border-slate-200 p-3 rounded-xl bg-white h-16 outline-none focus:border-blue-500 resize-none font-medium text-sm"></textarea></div>
-                                <button onclick="addKegiatan()" class="w-full bg-blue-600 text-white p-3.5 rounded-xl font-bold hover:bg-blue-700 shadow-md shadow-blue-200 mt-1 flex justify-center items-center gap-2 text-sm"><i data-lucide="plus-circle" class="w-4 h-4"></i> Tambah Kegiatan Insidental</button>
+                                <button onclick="addKegiatan()" class="w-full bg-blue-600 text-white p-3.5 rounded-xl font-bold hover:bg-blue-700 shadow-md shadow-blue-200 mt-1 flex justify-center items-center gap-2 text-sm"><i data-lucide="plus-circle" class="w-4 h-4"></i> Tambah Kegiatan Insidental</button><button onclick="bukaModalHapusMassal()" class="w-full md:w-auto bg-red-100 text-red-600 border border-red-200 hover:bg-red-500 hover:text-white hover:border-red-600 font-extrabold py-3 px-6 rounded-xl transition-all duration-300 mt-2 md:mt-0 md:ml-2 flex items-center justify-center gap-2 shadow-sm"><i data-lucide="trash-2" class="w-5 h-5"></i>Hapus Massal</button>
                             </div>
                             <div class="border-t border-slate-200 pt-5 flex-1 flex flex-col">
                                 <div class="flex justify-between items-center mb-1"><h4 class="font-bold text-slate-800 text-sm">Riwayat Kegiatan:</h4><input type="month" id="filter-tgl-kegiatan" onchange="renderKegiatan()" class="text-[10px] border border-slate-200 rounded-lg px-2 py-1 bg-white font-bold text-indigo-600 outline-none focus:border-indigo-500 shadow-sm"></div>
@@ -1370,11 +1404,11 @@ footer {
         };
 
         window.addKegiatan = () => { 
-            // PERBAIKAN: Menggunakan ID 'keg-kategori' (form input), BUKAN 'ek-kategori' (form edit)
             const kategori = document.getElementById('keg-kategori').value; 
             const nama = document.getElementById('keg-nama').value; 
             const tglAwal = document.getElementById('keg-tgl').value; 
             const tglAkhir = document.getElementById('keg-tgl-akhir').value; 
+            const perulangan = document.getElementById('keg-ulang') ? document.getElementById('keg-ulang').value : 'none';
             const jp = parseFloat(document.getElementById('keg-jp').value) || 0; 
             const satuan = document.getElementById('keg-satuan').value; 
             const mulai = document.getElementById('keg-mulai').value; 
@@ -1383,26 +1417,53 @@ footer {
             
             if(!nama || !tglAwal) return showToast("Nama kegiatan dan Tanggal Mulai wajib diisi!", "warning"); 
             
-            let targetDates = [tglAwal]; 
-            if(tglAkhir && tglAkhir >= tglAwal) { targetDates = getDatesInRange(tglAwal, tglAkhir); }
+            let targetDates = []; 
             
+            // LOGIKA PERULANGAN (ROUTINE ENGINE)
+            if(perulangan === 'none') {
+                // Logika lama: Jika hanya multi-hari berurutan
+                if(tglAkhir && tglAkhir >= tglAwal) { targetDates = getDatesInRange(tglAwal, tglAkhir); }
+                else { targetDates = [tglAwal]; }
+            } else {
+                // Logika baru: Perulangan Rutin Terjadwal
+                if(!tglAkhir || tglAkhir < tglAwal) return showToast("Untuk jadwal rutin, Tgl Akhir/Batas wajib diisi dengan benar!", "error");
+                
+                let currDate = new Date(tglAwal);
+                const endDate = new Date(tglAkhir);
+                
+                while(currDate <= endDate) {
+                    targetDates.push(currDate.toISOString().split('T')[0]);
+                    
+                    // Tambahkan hari/bulan sesuai pilihan
+                    if(perulangan === 'harian') {
+                        currDate.setDate(currDate.getDate() + 1);
+                    } else if(perulangan === 'mingguan') {
+                        currDate.setDate(currDate.getDate() + 7);
+                    } else if(perulangan === 'bulanan') {
+                        currDate.setMonth(currDate.getMonth() + 1);
+                    } else {
+                        break;
+                    }
+                }
+            }
+            
+            // Simpan semua tanggal yang sudah dihitung ke database
             targetDates.forEach(tglStr => { 
                 dataGlobal.kegiatan.push({ id: Date.now() + Math.random(), kategori, nama, tgl: tglStr, mulai, selesai, jp, satuan, ket, isFixed: false }); 
             });
             
             pushToCloud(true); 
             
-            // Bersihkan form setelah disimpan
+            // Bersihkan form
             document.getElementById('keg-nama').value = ''; 
             document.getElementById('keg-ket').value = ''; 
             document.getElementById('keg-jp').value = ''; 
             document.getElementById('keg-satuan').value = ''; 
             document.getElementById('keg-tgl-akhir').value = ''; 
-            document.getElementById('keg-kategori').value = 'Tambahan'; // Reset dropdown kembali ke default
+            document.getElementById('keg-kategori').value = 'Tambahan'; 
+            if(document.getElementById('keg-ulang')) document.getElementById('keg-ulang').value = 'none';
             
-            showToast(`Kegiatan disimpan untuk ${targetDates.length} hari.`);
-            
-            // Update langsung tampilan riwayat kegiatan di layar
+            showToast(`Selesai! Jadwal rutinan berhasil di-generate untuk ${targetDates.length} hari.`);
             renderKegiatan();
         };
         
@@ -1490,7 +1551,50 @@ footer {
             }
             container.innerHTML = html; lucide.createIcons(); 
         };
-        window.hapusKegiatan = (id) => { dataGlobal.kegiatan = dataGlobal.kegiatan.filter(k => k.id !== id); pushToCloud(true); showToast("Kegiatan Dihapus", "warning"); renderKegiatan(); };
+        // FITUR HAPUS MASSAL BERDASARKAN NAMA KEGIATAN
+        // FITUR HAPUS MASSAL + SUGGESTION OTOMATIS
+        window.bukaModalHapusMassal = () => {
+            if(!dataGlobal.kegiatan || dataGlobal.kegiatan.length === 0) return showToast("Belum ada data kegiatan untuk dihapus.", "warning");
+            
+            // 1. Mesin Pemindai: Mengumpulkan nama-nama unik dari seluruh kegiatan
+            const uniqueNames = [...new Set(dataGlobal.kegiatan.map(k => k.nama.trim()))].sort();
+            
+            // 2. Suntikkan nama-nama tersebut ke dalam datalist (Suggestion)
+            const dataList = document.getElementById('list-kegiatan-massal');
+            dataList.innerHTML = uniqueNames.map(nama => `<option value="${esc(nama)}">`).join('');
+            
+            // 3. Tampilkan Pop-up
+            document.getElementById('input-hapus-massal').value = '';
+            document.getElementById('modal-hapus-massal').classList.remove('hidden');
+            lucide.createIcons();
+        };
+
+        window.tutupModalHapusMassal = () => {
+            document.getElementById('modal-hapus-massal').classList.add('hidden');
+        };
+
+        window.eksekusiHapusMassal = () => {
+            const keyword = document.getElementById('input-hapus-massal').value;
+            if(!keyword) return showToast("Pilih atau ketik nama kegiatan terlebih dahulu!", "warning");
+            
+            const konfirmasi = confirm(`Yakin ingin menyapu bersih SEMUA kegiatan yang bernama "${keyword}"?\n\nTindakan ini tidak bisa dibatalkan.`);
+            if(!konfirmasi) return;
+
+            const jumlahAwal = dataGlobal.kegiatan.length;
+            dataGlobal.kegiatan = dataGlobal.kegiatan.filter(k => k.nama.toLowerCase().trim() !== keyword.toLowerCase().trim());
+            const jumlahAkhir = dataGlobal.kegiatan.length;
+            const totalDihapus = jumlahAwal - jumlahAkhir;
+
+            if(totalDihapus > 0) {
+                pushToCloud(true);
+                renderKegiatan();
+                tutupModalHapusMassal();
+                showToast(`Sukses! ${totalDihapus} jadwal "${keyword}" berhasil disapu bersih.`, "success");
+            } else {
+                showToast(`Gagal: Kegiatan "${keyword}" tidak ditemukan.`, "error");
+            }
+        };
+        
         window.bukaModalEditKegiatan = (id) => { const k = dataGlobal.kegiatan.find(x => x.id === id); document.getElementById('ek-id').value = id; document.getElementById('ek-kategori').value = k.kategori || 'Tambahan'; document.getElementById('ek-nama').value = k.nama; document.getElementById('ek-tgl').value = k.tgl; document.getElementById('ek-mulai').value = k.mulai; document.getElementById('ek-selesai').value = k.selesai; document.getElementById('ek-jp').value = k.jp; document.getElementById('ek-satuan').value = k.satuan || ''; document.getElementById('ek-ket').value = k.ket; document.getElementById('modal-edit-kegiatan').classList.remove('hidden'); }; 
         window.simpanEditKegiatan = () => { const id = parseFloat(document.getElementById('ek-id').value); const idx = dataGlobal.kegiatan.findIndex(x => x.id === id); dataGlobal.kegiatan[idx] = { ...dataGlobal.kegiatan[idx], kategori: document.getElementById('ek-kategori').value, nama: document.getElementById('ek-nama').value, tgl: document.getElementById('ek-tgl').value, mulai: document.getElementById('ek-mulai').value, selesai: document.getElementById('ek-selesai').value, jp: parseFloat(document.getElementById('ek-jp').value)||0, satuan: document.getElementById('ek-satuan').value, ket: document.getElementById('ek-ket').value }; pushToCloud(true); showToast("Perubahan Kegiatan Disimpan"); document.getElementById('modal-edit-kegiatan').classList.add('hidden'); renderKegiatan(); };
 
@@ -1534,11 +1638,15 @@ footer {
         
         window.simpanJurnalKBM = () => { const tglAwal = document.getElementById('jk-tgl').value; const tglAkhir = document.getElementById('jk-tgl-akhir').value; if(!tglAwal) return showToast("Pilih tanggal mulai!", "warning"); const isLibur = document.getElementById('jk-libur').checked; let targetDates = [tglAwal]; if(tglAkhir && tglAkhir >= tglAwal) { targetDates = getDatesInRange(tglAwal, tglAkhir); } if(!dataGlobal.liburKBM) dataGlobal.liburKBM = {}; if(!dataGlobal.jurnalKBM) dataGlobal.jurnalKBM = {}; targetDates.forEach(tglStr => { if(isLibur) { dataGlobal.liburKBM[tglStr] = true; } else { delete dataGlobal.liburKBM[tglStr]; const jadwalHariIni = getJadwalByDate(tglStr); if(!dataGlobal.jurnalKBM[tglStr]) dataGlobal.jurnalKBM[tglStr] = {}; jadwalHariIni.forEach(j => { const hid = document.getElementById(`hid-libur-${j.id}`); const el = document.getElementById(`jkm-${j.id}`); if(hid && hid.value === '1') { dataGlobal.jurnalKBM[tglStr][safeKey(j.id)] = '[LIBUR]'; } else if(el && el.value) { dataGlobal.jurnalKBM[tglStr][safeKey(j.id)] = el.value; } else { delete dataGlobal.jurnalKBM[tglStr][safeKey(j.id)]; } }); } }); pushToCloud(true); showToast(isLibur ? `Status Bebas KBM tersimpan untuk ${targetDates.length} hari!` : "Materi KBM Tersimpan!"); document.getElementById('jk-tgl-akhir').value = ''; };
 
+        // 1. KUMPULKAN DATA LCKH (UPACARA OTOMATIS NAIK KE NO. 1)
         window.kumpulkanDataLCKH = (tanggalList) => {
             let allActivities = [];
             tanggalList.forEach(tglStr => {
                 const parts = tglStr.split('-'); const localDate = new Date(parts[0], parts[1] - 1, parts[2]); const namaHari = namaHariIndonesia[localDate.getDay()];
                 const isLibur = dataGlobal.liburKBM && dataGlobal.liburKBM[tglStr];
+                
+                let harian = []; // Tampungan sementara untuk disortir per hari
+                
                 if (!isLibur) { 
                     const jadwalHariIni = getJadwalByDate(tglStr) || [];
                     const processedIds = new Set();
@@ -1548,20 +1656,34 @@ footer {
                         processedIds.add(safeKey(j.id));
                         let materiTeks = savedData ? `\nMateri: ${savedData}` : ''; 
                         const namaMapelKelas = j.nama ? j.nama : `${j.mapel || 'Mata Pelajaran'} ${j.kelas ? 'Kelas '+j.kelas : ''}`;
-                        allActivities.push({ tglStr, tglIndo: `${namaHari}, ${parts[2]} ${namaBulanIndo[parseInt(parts[1])-1]} ${parts[0]}`, uraian: `Melaksanakan KBM: ${namaMapelKelas}${materiTeks}`, output: "Terlaksana", vol: j.jp || 2, sat: "JP", ket: "" }); 
+                        harian.push({ tglStr, tglIndo: `${namaHari}, ${parts[2]} ${namaBulanIndo[parseInt(parts[1])-1]} ${parts[0]}`, uraian: `Melaksanakan KBM: ${namaMapelKelas}${materiTeks}`, output: "Terlaksana", vol: j.jp || 2, sat: "JP", ket: "", isPriority: false }); 
                     }); 
                     if (dataGlobal.jurnalKBM && dataGlobal.jurnalKBM[tglStr]) {
                         Object.entries(dataGlobal.jurnalKBM[tglStr]).forEach(([keyId, materiVal]) => {
                             if (!processedIds.has(keyId) && materiVal && materiVal !== '[LIBUR]') {
-                                allActivities.push({ tglStr, tglIndo: `${namaHari}, ${parts[2]} ${namaBulanIndo[parseInt(parts[1])-1]} ${parts[0]}`, uraian: `Melaksanakan KBM Tambahan\nMateri: ${materiVal}`, output: "Terlaksana", vol: 2, sat: "JP", ket: "Jurnal Tambahan" });
+                                harian.push({ tglStr, tglIndo: `${namaHari}, ${parts[2]} ${namaBulanIndo[parseInt(parts[1])-1]} ${parts[0]}`, uraian: `Melaksanakan KBM Tambahan\nMateri: ${materiVal}`, output: "Terlaksana", vol: 2, sat: "JP", ket: "Jurnal Tambahan", isPriority: false });
                             }
                         });
                     }
                 }
                 const extraHariIni = (dataGlobal.kegiatan || []).filter(k => k.tgl === tglStr); 
-                extraHariIni.forEach(e => { const oto = tentukanVolumeDanSatuan(e.nama, e.jp, e.satuan); allActivities.push({ tglStr, tglIndo: `${namaHari}, ${parts[2]} ${namaBulanIndo[parseInt(parts[1])-1]} ${parts[0]}`, uraian: e.nama, output: "Terlaksana", vol: oto.vol, sat: oto.sat, ket: e.ket, kategori: e.kategori }); });
+                extraHariIni.forEach(e => { 
+                    const oto = tentukanVolumeDanSatuan(e.nama, e.jp, e.satuan); 
+                    // Deteksi kata "upacara" untuk memaksanya naik ke posisi pertama
+                    const cekPrioritas = e.nama.toLowerCase().includes('upacara');
+                    harian.push({ tglStr, tglIndo: `${namaHari}, ${parts[2]} ${namaBulanIndo[parseInt(parts[1])-1]} ${parts[0]}`, uraian: e.nama, output: "Terlaksana", vol: oto.vol, sat: oto.sat, ket: e.ket, kategori: e.kategori, isPriority: cekPrioritas }); 
+                });
+                
+                // Urutkan agar Kegiatan Prioritas (Upacara) selalu di indeks [0]
+                harian.sort((a, b) => {
+                    if (a.isPriority && !b.isPriority) return -1;
+                    if (!a.isPriority && b.isPriority) return 1;
+                    return 0; 
+                });
+                
+                allActivities.push(...harian);
             });
-            return allActivities.sort((a,b) => a.tglStr.localeCompare(b.tglStr));
+            return allActivities; 
         };
 
         window.generateBukuJurnal = () => {
@@ -1683,6 +1805,7 @@ footer {
             container.innerHTML = html; document.getElementById('area-cetak-laporan').classList.add('hidden'); document.getElementById('area-cetak-jurnal').classList.add('hidden'); document.getElementById('area-cetak-jadwal').classList.add('hidden'); document.getElementById('area-cetak-lkb').classList.remove('hidden'); document.getElementById('area-cetak-lkb').scrollIntoView({ behavior: 'smooth' }); showToast("Laporan LKB Berhasil Dimuat!");
         };
 
+        // FITUR EXPORT EXCEL PROFESIONAL (DENGAN SENSOR TINGGI BARIS OTOMATIS)
         window.exportProfessionalExcel = async (type) => {
             try {
                 const wb = new ExcelJS.Workbook(); const ws = wb.addWorksheet(type.toUpperCase()); 
@@ -1699,6 +1822,7 @@ footer {
                     const dataLCKH = window.kumpulkanDataLCKH(dates); if(dataLCKH.length === 0) return showToast("Tidak ada data LCKH di bulan ini!", "warning");
                     const grouped = {}; dataLCKH.forEach(d => { if(!grouped[d.tglStr]) grouped[d.tglStr] = { tglIndo: d.tglIndo, items: [] }; grouped[d.tglStr].items.push(d); });
                     let currentRow = 1; ws.columns = [ {width: 5}, {width: 15}, {width: 15}, {width: 15}, {width: 15}, {width: 10}, {width: 10}, {width: 20} ];
+                    
                     for(const tgl in grouped) {
                         const parts = tgl.split('-'); const tglTtd = `${parts[2]} ${namaBulanIndo[parseInt(parts[1])-1]} ${parts[0]}`;
                         ws.mergeCells(`A${currentRow}:H${currentRow}`); let cTit = ws.getCell(`A${currentRow}`); cTit.value = 'LAPORAN CAPAIAN KINERJA HARIAN (LCKH)'; cTit.font = fontTitle; cTit.alignment = {horizontal:'center'}; currentRow++;
@@ -1708,13 +1832,29 @@ footer {
                         ws.getCell(`A${currentRow}`).value = 'Unit Kerja'; ws.getCell(`C${currentRow}`).value = ':'; ws.getCell(`C${currentRow}`).alignment={horizontal:'center'}; ws.mergeCells(`D${currentRow}:H${currentRow}`); ws.getCell(`D${currentRow}`).value = info.unit; currentRow++;
                         ws.getCell(`A${currentRow}`).value = 'Unit Organisasi'; ws.getCell(`C${currentRow}`).value = ':'; ws.getCell(`C${currentRow}`).alignment={horizontal:'center'}; ws.mergeCells(`D${currentRow}:H${currentRow}`); ws.getCell(`D${currentRow}`).value = info.org; currentRow++;
                         ws.getCell(`A${currentRow}`).value = 'Hari/Tanggal'; ws.getCell(`C${currentRow}`).value = ':'; ws.getCell(`C${currentRow}`).alignment={horizontal:'center'}; ws.mergeCells(`D${currentRow}:H${currentRow}`); ws.getCell(`D${currentRow}`).value = grouped[tgl].tglIndo; currentRow += 2;
+                        
                         const headerRow = ws.getRow(currentRow); headerRow.values = ['No', 'Uraian Kegiatan', '', '', 'Output', 'Volume', 'Satuan', 'Ket']; ws.mergeCells(`B${currentRow}:D${currentRow}`);
                         headerRow.eachCell(c => { c.font = fontHeader; c.border = borderAll; c.alignment = {horizontal:'center', vertical:'middle'}; c.fill = fillHeader; }); currentRow++;
-                        grouped[tgl].items.forEach((item, idx) => { const row = ws.getRow(currentRow); row.values = [idx + 1, item.uraian, '', '', item.output, item.vol, item.sat, item.ket]; ws.mergeCells(`B${currentRow}:D${currentRow}`); row.eachCell((c, colNum) => { c.font = fontNormal; c.border = borderAll; c.alignment = {vertical:'top', wrapText:true}; if(colNum !== 2) c.alignment.horizontal = 'center'; }); currentRow++; });
+                        
+                        grouped[tgl].items.forEach((item, idx) => { 
+                            const row = ws.getRow(currentRow); 
+                            row.values = [idx + 1, item.uraian, '', '', item.output, item.vol, item.sat, item.ket]; 
+                            ws.mergeCells(`B${currentRow}:D${currentRow}`); 
+                            row.eachCell((c, colNum) => { c.font = fontNormal; c.border = borderAll; c.alignment = {vertical:'top', wrapText:true}; if(colNum !== 2) c.alignment.horizontal = 'center'; }); 
+                            
+                            // SENSOR ALGORITMA TINGGI BARIS (AUTO-FIT)
+                            let linesUraian = 0; (item.uraian||'').split('\n').forEach(l => { linesUraian += Math.ceil(l.length / 45) || 1; });
+                            let linesKet = 0; (item.ket||'').split('\n').forEach(l => { linesKet += Math.ceil(l.length / 20) || 1; });
+                            const maxLines = Math.max(linesUraian, linesKet);
+                            if(maxLines > 1) row.height = maxLines * 15; // 15 = tinggi 1 baris
+                            
+                            currentRow++; 
+                        });
+                        
                         currentRow += 2; ws.getCell(`F${currentRow}`).value = `Bekasi, ${tglTtd}`; currentRow++; ws.getCell(`B${currentRow}`).value = 'Mengetahui,'; currentRow++; ws.getCell(`B${currentRow}`).value = titleKepsek; ws.getCell(`F${currentRow}`).value = 'Pegawai yang dinilai'; currentRow += 5;
                         if(imageIdKepsek) { ws.addImage(imageIdKepsek, { tl: { col: 1, row: currentRow - 4 }, ext: { width: 120, height: 70 } }); } if(imageId) { ws.addImage(imageId, { tl: { col: 5, row: currentRow - 4 }, ext: { width: 120, height: 70 } }); } 
                         ws.getCell(`B${currentRow}`).value = info.kepsek; ws.getCell(`F${currentRow}`).value = info.nama; ws.getCell(`B${currentRow}`).font = {name:'Arial', size:10, bold:true, underline:true}; ws.getCell(`F${currentRow}`).font = {name:'Arial', size:10, bold:true, underline:true}; currentRow++;
-                        ws.getCell(`B${currentRow}`).value = `NIP. ${info.nipKepsek}`; ws.getCell(`F${currentRow}`).value = `NIP. ${info.nip}`; currentRow += 4; 
+                        ws.getCell(`B${currentRow}`).value = `NIP. ${info.nipKepsek}`; ws.getCell(`F${currentRow}`).value = `NIP. ${info.nip}`; currentRow += 5; 
                     }
                 }
 
@@ -1732,7 +1872,9 @@ footer {
                     kegiatanBulanan.forEach(k => { const oto = tentukanVolumeDanSatuan(k.nama, k.jp, k.satuan); let cleanNama = k.nama.trim(); let key = `${k.kategori}_${cleanNama}`; if(!recapKegiatan[key]) { recapKegiatan[key] = { kategori: k.kategori, uraian: cleanNama, output: "Terlaksana", vol: oto.vol, sat: oto.sat, ket: k.ket }; } else { recapKegiatan[key].vol += oto.vol; } });
                     Object.values(recapKegiatan).forEach(obj => { if(obj.kategori === 'Utama') tugasUtama.push(obj); else if(obj.kategori === 'Pelatihan') tugasPelatihan.push(obj); else tugasTambahan.push(obj); });
                     
-                    // PENYESUAIAN STRUKTUR KOLOM MENJADI 8 KOLOM (SAMA PERSIS DENGAN LCKH)
+                    const urutPrioritas = (arr) => arr.sort((a,b) => (b.uraian.toLowerCase().includes('upacara') ? 1 : 0) - (a.uraian.toLowerCase().includes('upacara') ? 1 : 0));
+                    urutPrioritas(tugasUtama); urutPrioritas(tugasTambahan); urutPrioritas(tugasPelatihan);
+                    
                     ws.columns = [ {width: 5}, {width: 15}, {width: 15}, {width: 15}, {width: 15}, {width: 10}, {width: 10}, {width: 20} ];
                     ws.mergeCells('A1:H1'); ws.getCell('A1').value = 'LAPORAN KINERJA BULANAN (LKB)'; ws.getCell('A1').font = fontTitle; ws.getCell('A1').alignment = { horizontal: 'center' };
                     ws.mergeCells('A2:H2'); ws.getCell('A2').value = 'Aparatur Sipil Negara Kementerian Agama Kota Bekasi'; ws.getCell('A2').font = fontBold; ws.getCell('A2').alignment = { horizontal: 'center' };
@@ -1764,6 +1906,13 @@ footer {
                                 const r = ws.getRow(currentRow); r.values = [i + 1, t.uraian, '', '', t.output, t.vol, t.sat, t.ket]; 
                                 ws.mergeCells(`B${currentRow}:D${currentRow}`);
                                 r.eachCell((c, colNum) => { c.font = fontNormal; c.border = borderAll; c.alignment = { vertical: 'top', wrapText: true }; if (colNum !== 2 && colNum !== 3 && colNum !== 4 && colNum !== 8) c.alignment.horizontal = 'center'; }); 
+                                
+                                // SENSOR ALGORITMA TINGGI BARIS (AUTO-FIT)
+                                let linesUraian = 0; (t.uraian||'').split('\n').forEach(l => { linesUraian += Math.ceil(l.length / 45) || 1; });
+                                let linesKet = 0; (t.ket||'').split('\n').forEach(l => { linesKet += Math.ceil(l.length / 20) || 1; });
+                                const maxLines = Math.max(linesUraian, linesKet);
+                                if(maxLines > 1) r.height = maxLines * 15;
+
                                 currentRow++; 
                             }); 
                         } 
